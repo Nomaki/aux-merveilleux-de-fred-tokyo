@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { CakeOrder, CartItem } from '../types';
 import { IconCake, IconInfoCircle, IconPlus, IconMinus, IconTrash, IconShoppingCart } from '@tabler/icons-react';
+import merveilleuxImg from '../assets/merveilleux.png';
+import incroyableImg from '../assets/incroyable.png';
+import plateImg from '../assets/plate.png';
 
 export function ReservationForm() {
   const { t } = useTranslation();
@@ -195,7 +198,7 @@ export function ReservationForm() {
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Group justify="space-between" align="flex-start" mb="md">
                     <Group align="flex-start">
-                      <Image src="/src/assets/merveilleux.png" alt="Le Merveilleux" w={90} h={80} radius="md" />
+                      <Image src={merveilleuxImg} alt="Le Merveilleux" w={90} h={80} radius="md" />
                       <Box>
                         <Text fw={500}>Le Merveilleux</Text>
                         <Text size="sm" c="dimmed">
@@ -243,7 +246,7 @@ export function ReservationForm() {
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Group justify="space-between" align="flex-start" mb="md">
                     <Group align="flex-start">
-                      <Image src="/src/assets/incroyable.png" alt="L'incroyable" w={90} h={80} radius="md" />
+                      <Image src={incroyableImg} alt="L'incroyable" w={90} h={80} radius="md" />
                       <Box>
                         <Text fw={500}>L'incroyable</Text>
                         <Text size="sm" c="dimmed">
@@ -291,7 +294,7 @@ export function ReservationForm() {
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Group justify="space-between" align="flex-start" mb="md">
                     <Group align="flex-start">
-                      <Image src="/src/assets/plate.png" alt="Birthday Plate" w={90} h={90} radius="md" />
+                      <Image src={plateImg} alt="Birthday Plate" w={90} h={90} radius="md" />
                       <Box>
                         <Text fw={500}>Birthday Plate</Text>
                         <Text size="sm" c="dimmed">

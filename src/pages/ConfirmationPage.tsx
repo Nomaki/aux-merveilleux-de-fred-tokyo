@@ -13,6 +13,9 @@ import {
   Image,
   Alert,
 } from '@mantine/core';
+import merveilleuxImg from '../assets/merveilleux.png';
+import incroyableImg from '../assets/incroyable.png';
+import plateImg from '../assets/plate.png';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
@@ -83,13 +86,13 @@ export function ConfirmationPage() {
   const getCakeImage = (cakeType: string) => {
     switch (cakeType) {
       case 'merveilleux':
-        return '/src/assets/merveilleux.png';
+        return merveilleuxImg;
       case 'incroyable':
-        return '/src/assets/incroyable.png';
+        return incroyableImg;
       case 'plate':
-        return '/src/assets/plate.png';
+        return plateImg;
       default:
-        return '/src/assets/merveilleux.png';
+        return merveilleuxImg;
     }
   };
 
