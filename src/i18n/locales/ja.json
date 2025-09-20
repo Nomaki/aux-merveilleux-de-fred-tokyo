@@ -1,0 +1,97 @@
+{
+  "common": {
+    "next": "次へ",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "edit": "編集",
+    "required": "必須",
+    "language": "言語"
+  },
+  "header": {
+    "title": "バースデーケーキ予約"
+  },
+  "form": {
+    "title": "ケーキ予約フォーム",
+    "nameKanji": "お名前（漢字）",
+    "familyNameKanji": "姓（漢字）",
+    "nameKatakana": "お名前（カタカナ）",
+    "familyNameKatakana": "姓（カタカナ）",
+    "deliveryDateTime": "お届け日時",
+    "cakeType": "ケーキの種類",
+    "cakeTypeChocolate": "チョコレートケーキ",
+    "cakeTypeVanilla": "バニラケーキ",
+    "cakeText": "ケーキに書くメッセージ",
+    "cakeTextPlaceholder": "お誕生日おめでとう！",
+    "cakeTextLimit": "最大25文字",
+    "phoneNumber": "電話番号",
+    "email": "メールアドレス",
+    "submitOrder": "注文内容を確認"
+  },
+  "validation": {
+    "required": "この項目は必須です",
+    "invalidEmail": "有効なメールアドレスを入力してください",
+    "invalidPhone": "有効な電話番号を入力してください",
+    "minDate": "お届け日時は現在から48時間後以降で選択してください",
+    "maxTextLength": "メッセージは30文字以内で入力してください",
+    "acceptTerms": "利用規約に同意してください"
+  },
+  "confirmation": {
+    "title": "注文内容の確認",
+    "orderDetails": "ご注文詳細",
+    "customerInfo": "お客様情報",
+    "proceedToPayment": "お支払いへ進む"
+  },
+  "payment": {
+    "title": "お支払い",
+    "selectMethod": "お支払い方法を選択してください",
+    "creditCard": "クレジットカード",
+    "paypay": "PayPay",
+    "processing": "処理中...",
+    "complete": "支払い完了"
+  },
+  "success": {
+    "title": "ご注文ありがとうございました",
+    "reservationCode": "予約番号",
+    "deliveryTime": "お届け予定日時",
+    "emailSent": "確認メールを送信いたしました",
+    "saveCode": "予約番号は大切に保管してください"
+  },
+  "cart": {
+    "title": "カート",
+    "addToCart": "カートに追加",
+    "selectCakes": "ケーキを選んでカートに追加",
+    "empty": "カートが空です",
+    "emptyMessage": "注文する前にカートに商品を追加してください",
+    "addItemsFirst": "まずカートに商品を追加してください",
+    "total": "合計：",
+    "item": "個",
+    "items": "個",
+    "size": "サイズ",
+    "service": "サービス",
+    "takeout": "お持ち帰り",
+    "takein": "店内利用（+¥300）",
+    "persons": "人前",
+    "text": "文字",
+    "each": "個"
+  },
+  "terms": {
+    "title": "利用規約",
+    "mainTitle": "バースデーケーキ予約 利用規約",
+    "accept": "規約に同意",
+    "close": "閉じる",
+    "agreeText": "同意します",
+    "policy1": "1. 予約に関して",
+    "policy2": "2. 支払いについて",
+    "policy3": "3. 配送について",
+    "policy4": "4. ケーキの品質について",
+    "policy5": "5. キャンセルについて",
+    "policy6": "6. お問い合わせ"
+  },
+  "loading": "読み込み中...",
+  "errors": {
+    "paymentFailed": "お支払いに失敗しました",
+    "networkError": "ネットワークエラーが発生しました",
+    "tryAgain": "もう一度お試しください"
+  }
+}

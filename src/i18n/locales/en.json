@@ -1,0 +1,97 @@
+{
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "required": "Required",
+    "language": "Language"
+  },
+  "header": {
+    "title": "Birthday Cake Reservation"
+  },
+  "form": {
+    "title": "Cake Reservation Form",
+    "nameKanji": "First Name (Kanji)",
+    "familyNameKanji": "Family Name (Kanji)",
+    "nameKatakana": "First Name (Katakana)",
+    "familyNameKatakana": "Family Name (Katakana)",
+    "deliveryDateTime": "Delivery Date & Time",
+    "cakeType": "Cake Type",
+    "cakeTypeChocolate": "Chocolate Cake",
+    "cakeTypeVanilla": "Vanilla Cake",
+    "cakeText": "Message on Cake",
+    "cakeTextPlaceholder": "Happy Birthday!",
+    "cakeTextLimit": "Maximum 25 characters",
+    "phoneNumber": "Phone Number",
+    "email": "Email Address",
+    "submitOrder": "Review Order"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "minDate": "Delivery time must be at least 48 hours from now",
+    "maxTextLength": "Message must be 30 characters or less",
+    "acceptTerms": "You must accept the terms and conditions"
+  },
+  "confirmation": {
+    "title": "Order Confirmation",
+    "orderDetails": "Order Details",
+    "customerInfo": "Customer Information",
+    "proceedToPayment": "Proceed to Payment"
+  },
+  "payment": {
+    "title": "Payment",
+    "selectMethod": "Select Payment Method",
+    "creditCard": "Credit Card",
+    "paypay": "PayPay",
+    "processing": "Processing...",
+    "complete": "Payment Complete"
+  },
+  "success": {
+    "title": "Thank You for Your Order",
+    "reservationCode": "Reservation Code",
+    "deliveryTime": "Scheduled Delivery Time",
+    "emailSent": "Confirmation email has been sent",
+    "saveCode": "Please save your reservation code"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "addToCart": "Add to Cart",
+    "selectCakes": "Select Cakes to Add to Cart",
+    "empty": "Cart is empty",
+    "emptyMessage": "Please add at least one item to your cart before submitting",
+    "addItemsFirst": "Add items to cart first",
+    "total": "Total:",
+    "item": "item",
+    "items": "items",
+    "size": "Size",
+    "service": "Service",
+    "takeout": "Take out",
+    "takein": "Take in (+¥300)",
+    "persons": "persons",
+    "text": "Text",
+    "each": "each"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "mainTitle": "Birthday Cake Reservation Terms and Conditions",
+    "accept": "Accept Terms",
+    "close": "Close",
+    "agreeText": "I agree to the",
+    "policy1": "1. Reservation Policy",
+    "policy2": "2. Payment Terms",
+    "policy3": "3. Delivery Information",
+    "policy4": "4. Cake Quality",
+    "policy5": "5. Cancellation Policy",
+    "policy6": "6. Contact Information"
+  },
+  "loading": "Loading...",
+  "errors": {
+    "paymentFailed": "Payment failed",
+    "networkError": "Network error occurred",
+    "tryAgain": "Please try again"
+  }
+}
