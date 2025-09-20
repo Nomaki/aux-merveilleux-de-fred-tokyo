@@ -8,10 +8,12 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 
 function App() {
+  const basename = import.meta.env.PROD ? '/aux-merveilleux-de-fred-tokyo' : '/';
+
   return (
     <MantineProvider theme={theme}>
       <Notifications />
-      <Router>
+      <Router basename={basename}>
         <Layout />
       </Router>
     </MantineProvider>
