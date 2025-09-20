@@ -5,12 +5,12 @@ A modern React application for birthday cake reservations with Japanese/English 
 ## Features
 
 - **Multi-language Support**: Japanese (default) and English
-- **Complete Reservation Flow**: 
+- **Complete Reservation Flow**:
   - Form with validation for customer details
   - Date/time picker with 48h minimum advance booking
   - Cake type selection with visual cards
   - Confirmation page with edit capability
-  - Payment processing (Card & PayPay)
+  - Payment processing
   - Success page with unique reservation code
 - **Modern UI**: Built with Mantine components and custom theming
 - **Responsive Design**: Works on desktop and mobile devices
@@ -40,17 +40,20 @@ A modern React application for birthday cake reservations with Japanese/English 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/birthday-reservation-fred.git
    cd birthday-reservation-fred
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -121,6 +124,7 @@ src/
 ### Colors
 
 The app uses a custom color scheme defined in `src/theme.ts`:
+
 - Primary: `#F0D891` (golden yellow)
 - Background: `#FEFFFF` (off-white)
 - Footer: `#000000` (black)
@@ -128,6 +132,7 @@ The app uses a custom color scheme defined in `src/theme.ts`:
 ### Languages
 
 Add new languages by:
+
 1. Creating a new locale file in `src/i18n/locales/`
 2. Updating the i18n configuration in `src/i18n/index.ts`
 3. Adding language options to the `LanguageToggle` component
