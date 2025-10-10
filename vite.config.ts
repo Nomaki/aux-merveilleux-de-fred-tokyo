@@ -5,17 +5,20 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   // Use '/' for Vercel deployment
   // Change to '/aux-merveilleux-de-fred-tokyo/' if deploying to GitHub Pages
-  base: '/',
+  base: '/aux-merveilleux-de-fred-tokyo/',
   plugins: [
     react({
       babel: {
         plugins: [
-          ['@locator/babel-jsx/dist', {
-            env: 'development',
-          }]
-        ]
-      }
-    })
+          [
+            '@locator/babel-jsx/dist',
+            {
+              env: 'development',
+            },
+          ],
+        ],
+      },
+    }),
   ],
   optimizeDeps: {
     include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
