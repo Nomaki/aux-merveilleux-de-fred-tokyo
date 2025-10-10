@@ -8,7 +8,9 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 
 function App() {
-  const basename = import.meta.env.PROD ? '/aux-merveilleux-de-fred-tokyo' : '/';
+  // Use '/' for Vercel deployment
+  // Change to '/aux-merveilleux-de-fred-tokyo' if deploying to GitHub Pages
+  const basename = '/';
 
   return (
     <MantineProvider theme={theme}>
