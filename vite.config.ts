@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   // Use '/' for Vercel deployment
   // Change to '/aux-merveilleux-de-fred-tokyo/' if deploying to GitHub Pages
-  base: '/aux-merveilleux-de-fred-tokyo/',
+  base: '/',
   plugins: [
     react({
       babel: {
