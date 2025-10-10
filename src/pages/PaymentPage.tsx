@@ -19,7 +19,9 @@ import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { CakeOrder, CartItem } from '../types';
 import { IconCreditCard, IconBrandPaypal, IconAlertCircle, IconLock } from '@tabler/icons-react';
-import { createPaymentIntent, processPayPay } from '../services/stripe';
+import { processPayPay, getStripe, createPaymentIntent } from '../services/stripe';
+import { Elements } from '@stripe/react-stripe-js';
+import { StripePaymentForm } from '../components/StripePaymentForm';
 
 type PaymentMethod = 'card' | 'paypay';
 
@@ -29,10 +31,8 @@ export function PaymentPage() {
   const [orderData, setOrderData] = useState<CakeOrder | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentIntent, setPaymentIntent] = useState<{
-    clientSecret: string;
-    paymentIntentId: string;
-  } | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const stripePromise = getStripe();
 
   useEffect(() => {
     const storedOrder = localStorage.getItem('cakeOrder');
@@ -50,12 +50,25 @@ export function PaymentPage() {
       const order = JSON.parse(storedOrder);
       order.deliveryDateTime = new Date(order.deliveryDateTime);
       setOrderData(order);
-      
-      // Calculate total from cart items
-      const total = order.cartItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0);
 
-      // Create payment intent for card payments
-      createPaymentIntent(total).then(setPaymentIntent);
+      // Create PaymentIntent when order data is loaded
+      const amount = order.cartItems.reduce(
+        (total: number, item: CartItem) => total + (item.price * item.quantity),
+        0
+      );
+
+      createPaymentIntent(amount, order)
+        .then((result) => {
+          setClientSecret(result.clientSecret);
+        })
+        .catch((error) => {
+          notifications.show({
+            title: t('errors.networkError'),
+            message: 'Failed to initialize payment. Please try again.',
+            color: 'red',
+          });
+          console.error('Failed to create payment intent:', error);
+        });
     } catch (error) {
       notifications.show({
         title: t('errors.networkError'),
@@ -66,45 +79,26 @@ export function PaymentPage() {
     }
   }, [navigate, t]);
 
-  const handleCardPayment = async () => {
-    if (!paymentIntent || !orderData) return;
+  const handlePaymentSuccess = () => {
+    if (!orderData) return;
 
-    setIsProcessing(true);
-    try {
-      // Mock card payment processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Simulate 95% success rate
-      if (Math.random() > 0.05) {
-        const reservationCode = generateReservationCode();
-        const confirmation = {
-          reservationCode,
-          order: orderData,
-          paymentStatus: 'completed' as const,
-          createdAt: new Date(),
-        };
-        
-        localStorage.setItem('reservationConfirmation', JSON.stringify(confirmation));
-        
-        notifications.show({
-          title: t('payment.complete'),
-          message: t('success.title'),
-          color: 'green',
-        });
-        
-        navigate('/success');
-      } else {
-        throw new Error('Payment failed');
-      }
-    } catch (error) {
-      notifications.show({
-        title: t('errors.paymentFailed'),
-        message: t('errors.tryAgain'),
-        color: 'red',
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    const reservationCode = generateReservationCode();
+    const confirmation = {
+      reservationCode,
+      order: orderData,
+      paymentStatus: 'completed' as const,
+      createdAt: new Date(),
+    };
+
+    localStorage.setItem('reservationConfirmation', JSON.stringify(confirmation));
+
+    notifications.show({
+      title: t('payment.complete'),
+      message: t('success.title'),
+      color: 'green',
+    });
+
+    navigate('/success');
   };
 
   const handlePayPayPayment = async () => {
@@ -113,25 +107,9 @@ export function PaymentPage() {
     setIsProcessing(true);
     try {
       const result = await processPayPay(orderData);
-      
+
       if (result.success) {
-        const reservationCode = generateReservationCode();
-        const confirmation = {
-          reservationCode,
-          order: orderData,
-          paymentStatus: 'completed' as const,
-          createdAt: new Date(),
-        };
-        
-        localStorage.setItem('reservationConfirmation', JSON.stringify(confirmation));
-        
-        notifications.show({
-          title: t('payment.complete'),
-          message: t('success.title'),
-          color: 'green',
-        });
-        
-        navigate('/success');
+        handlePaymentSuccess();
       }
     } catch (error) {
       notifications.show({
@@ -146,14 +124,6 @@ export function PaymentPage() {
 
   const generateReservationCode = () => {
     return 'CAKE-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
-  };
-
-  const handlePayment = () => {
-    if (paymentMethod === 'card') {
-      handleCardPayment();
-    } else {
-      handlePayPayPayment();
-    }
   };
 
   const goBack = () => {
@@ -257,34 +227,48 @@ export function PaymentPage() {
             </Radio.Group>
           </Box>
 
-          {paymentMethod === 'card' && !paymentIntent && (
-            <Center>
-              <Loader />
-            </Center>
-          )}
+          <Divider />
 
-          <Group justify="center" gap="md" mt="xl">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={goBack}
-              disabled={isProcessing}
-            >
-              {t('common.back')}
-            </Button>
-            <Button
-              size="lg"
-              color="primary"
-              onClick={handlePayment}
-              loading={isProcessing}
-              disabled={!paymentIntent && paymentMethod === 'card'}
-            >
-              {isProcessing 
-                ? t('payment.processing')
-                : `${price}を支払う`
-              }
-            </Button>
-          </Group>
+          {paymentMethod === 'card' ? (
+            clientSecret ? (
+              <Elements
+                stripe={stripePromise}
+                options={{ clientSecret }}
+              >
+                <StripePaymentForm
+                  amount={getTotalPrice()}
+                  onSuccess={handlePaymentSuccess}
+                  onBack={goBack}
+                />
+              </Elements>
+            ) : (
+              <Center py="xl">
+                <Loader />
+              </Center>
+            )
+          ) : (
+            <Group justify="center" gap="md" mt="xl">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={goBack}
+                disabled={isProcessing}
+              >
+                {t('common.back')}
+              </Button>
+              <Button
+                size="lg"
+                color="primary"
+                onClick={handlePayPayPayment}
+                loading={isProcessing}
+              >
+                {isProcessing
+                  ? t('payment.processing')
+                  : `${price}を支払う`
+                }
+              </Button>
+            </Group>
+          )}
         </Stack>
       </Paper>
     </Box>

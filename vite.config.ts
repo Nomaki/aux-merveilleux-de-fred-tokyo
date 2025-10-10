@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/aux-merveilleux-de-fred-tokyo/' : '/',
+  // Use '/' for Vercel deployment
+  // Change to '/aux-merveilleux-de-fred-tokyo/' if deploying to GitHub Pages
+  base: '/',
   plugins: [
     react({
       babel: {
@@ -15,4 +17,7 @@ export default defineConfig(({ command }) => ({
       }
     })
   ],
+  optimizeDeps: {
+    include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+  },
 }));

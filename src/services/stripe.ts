@@ -1,18 +1,50 @@
-// This is a mock Stripe service for demonstration
-// In production, you would use your actual Stripe publishable key
+import { loadStripe } from '@stripe/stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 
-export const STRIPE_PUBLISHABLE_KEY = 'pk_test_your_stripe_publishable_key_here';
+// Get Stripe publishable key from environment variables
+export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-export const createPaymentIntent = async (_amount: number = 5000) => {
-  // Mock API call - in production, this would be a call to your backend
-  return new Promise<{ clientSecret: string; paymentIntentId: string }>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        clientSecret: `pi_mock_${Date.now()}_secret_mock`,
-        paymentIntentId: `pi_mock_${Date.now()}`,
-      });
-    }, 1000);
-  });
+// Initialize Stripe
+let stripePromise: Promise<Stripe | null>;
+
+export const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromise;
+};
+
+// Create Payment Intent by calling our backend API
+export const createPaymentIntent = async (
+  amount: number,
+  orderData?: any
+): Promise<{ clientSecret: string; paymentIntentId: string }> => {
+  try {
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount,
+        orderData,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create payment intent');
+    }
+
+    const data = await response.json();
+    return {
+      clientSecret: data.clientSecret,
+      paymentIntentId: data.paymentIntentId,
+    };
+  } catch (error: any) {
+    console.error('Error creating payment intent:', error);
+    throw new Error(error.message || 'Failed to create payment intent');
+  }
 };
 
 export const processPayPay = async (_orderData: any) => {
