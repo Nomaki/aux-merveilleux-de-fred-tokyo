@@ -32,6 +32,7 @@ export function PaymentPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [reservationCode, setReservationCode] = useState<string>('');
   const stripePromise = getStripe();
 
   useEffect(() => {
@@ -51,13 +52,23 @@ export function PaymentPage() {
       order.deliveryDateTime = new Date(order.deliveryDateTime);
       setOrderData(order);
 
+      // Generate reservation code before payment
+      const newReservationCode = generateReservationCode();
+      setReservationCode(newReservationCode);
+
+      // Add reservation code to order data for Stripe metadata
+      const orderWithReservation = {
+        ...order,
+        reservationCode: newReservationCode,
+      };
+
       // Create PaymentIntent when order data is loaded
       const amount = order.cartItems.reduce(
         (total: number, item: CartItem) => total + (item.price * item.quantity),
         0
       );
 
-      createPaymentIntent(amount, order, i18n.language)
+      createPaymentIntent(amount, orderWithReservation, i18n.language)
         .then((result) => {
           setClientSecret(result.clientSecret);
         })
@@ -80,9 +91,8 @@ export function PaymentPage() {
   }, [navigate, t]);
 
   const handlePaymentSuccess = () => {
-    if (!orderData) return;
+    if (!orderData || !reservationCode) return;
 
-    const reservationCode = generateReservationCode();
     const confirmation = {
       reservationCode,
       order: orderData,
@@ -101,8 +111,12 @@ export function PaymentPage() {
     navigate('/success');
   };
 
+  const generateReservationCode = () => {
+    return 'CAKE-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+  };
+
   const handlePayPayPayment = async () => {
-    if (!orderData) return;
+    if (!orderData || !reservationCode) return;
 
     setIsProcessing(true);
     try {
@@ -111,7 +125,13 @@ export function PaymentPage() {
         0
       );
 
-      const result = await processPayPay(amount, orderData, i18n.language);
+      // Add reservation code to order data for Stripe metadata
+      const orderWithReservation = {
+        ...orderData,
+        reservationCode,
+      };
+
+      const result = await processPayPay(amount, orderWithReservation, i18n.language);
 
       if (result.success) {
         handlePaymentSuccess();
@@ -125,10 +145,6 @@ export function PaymentPage() {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const generateReservationCode = () => {
-    return 'CAKE-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
   };
 
   const goBack = () => {

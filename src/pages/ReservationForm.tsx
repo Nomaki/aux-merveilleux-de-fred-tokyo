@@ -28,7 +28,7 @@ export function ReservationForm() {
       familyNameKanji: '',
       nameKatakana: '',
       familyNameKatakana: '',
-      deliveryDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000), // Default to 48h from now
+      deliveryDateTime: null as any, // No default date - user must select
       cartItems: [],
       cakeText: '',
       phoneNumber: '',
@@ -41,6 +41,7 @@ export function ReservationForm() {
       nameKatakana: (value: string) => (value.length === 0 ? t('validation.required') : null),
       familyNameKatakana: (value: string) => (value.length === 0 ? t('validation.required') : null),
       deliveryDateTime: (value: Date) => {
+        if (!value) return t('validation.required');
         const minDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
         return value < minDate ? t('validation.minDate') : null;
       },

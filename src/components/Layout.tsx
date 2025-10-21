@@ -38,7 +38,9 @@ export function Layout() {
       <AppShell.Header>
         <Container size="lg">
           <Group justify="center" align="center" py="md" pos="relative">
-            <Image src={logoSvg} alt="Logo" style={{ maxWidth: '200px', height: 'auto' }} />
+            <Anchor component={Link} to="/" style={{ textDecoration: 'none' }}>
+              <Image src={logoSvg} alt="Logo" style={{ maxWidth: '200px', height: 'auto', cursor: 'pointer' }} />
+            </Anchor>
             <div style={{ position: 'absolute', right: 0 }}>
               <LanguageToggle />
             </div>

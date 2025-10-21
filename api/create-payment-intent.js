@@ -20,14 +20,30 @@ export default async function handler(req, res) {
       });
     }
 
+    // Prepare customer name for Stripe
+    const customerName = orderData?.familyNameKanji && orderData?.nameKanji
+      ? `${orderData.familyNameKanji} ${orderData.nameKanji}`
+      : 'Unknown';
+
+    // Prepare description for Stripe dashboard
+    const description = orderData?.reservationCode
+      ? `Birthday Cake Order - ${orderData.reservationCode} - ${customerName}`
+      : `Birthday Cake Order - ${customerName}`;
+
     // Prepare payment intent configuration
     const paymentIntentConfig = {
       amount: Math.round(amount), // Amount in smallest currency unit (yen)
       currency: 'jpy', // Japanese Yen
+      description: description,
       metadata: {
+        reservationCode: orderData?.reservationCode || '',
         orderDate: orderData?.deliveryDateTime || new Date().toISOString(),
-        customerName: orderData?.nameKanji || 'Unknown',
+        customerName: customerName,
+        customerNameKatakana: orderData?.familyNameKatakana && orderData?.nameKatakana
+          ? `${orderData.familyNameKatakana} ${orderData.nameKatakana}`
+          : '',
         customerEmail: orderData?.email || '',
+        customerPhone: orderData?.phoneNumber || '',
         language: language,
         paymentMethod: paymentMethod,
       },
