@@ -71,15 +71,31 @@ export function SuccessPage() {
 
   const sendConfirmationEmail = async (confirmationData: ReservationConfirmation) => {
     try {
-      // Mock email service call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch('/api/send-confirmation-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          confirmationData,
+          language: i18n.language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      const data = await response.json();
+      console.log('Email sent:', data);
+
       notifications.show({
         title: t('success.emailSent'),
         message: `Email sent to ${confirmationData.order.email}`,
         color: 'green',
       });
     } catch (error) {
+      console.error('Error sending email:', error);
       notifications.show({
         title: 'Email Error',
         message: 'Failed to send confirmation email, but your reservation is confirmed.',

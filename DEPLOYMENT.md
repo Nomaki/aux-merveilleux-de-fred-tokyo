@@ -33,15 +33,23 @@ git push origin main
 **IMPORTANT** : Avant de déployer, configurez ces variables :
 
 1. Dans Vercel, allez dans **Settings → Environment Variables**
-2. Ajoutez ces 3 variables :
+2. Ajoutez ces 5 variables :
 
 | Variable Name | Value | Where to find it |
 |--------------|-------|------------------|
 | `VITE_STRIPE_PUBLISHABLE_KEY` | `pk_test_51SGXawJd...` | Stripe Dashboard → Developers → API keys |
 | `STRIPE_SECRET_KEY` | `sk_test_51SGXawJd...` | ⚠️ GARDEZ SECRÈTE |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` | On le configurera après |
+| `RESEND_API_KEY` | `re_...` | Resend Dashboard → API Keys |
+| `RESEND_FROM_EMAIL` | `onboarding@resend.dev` | Pour test, ou votre email vérifié |
 
 **Note** : Pour l'instant, laissez `STRIPE_WEBHOOK_SECRET` vide, on le configurera à l'étape 5.
+
+**Pour Resend** :
+- Allez sur https://resend.com et créez un compte (gratuit)
+- Dans **API Keys**, créez une nouvelle clé
+- Pour tester, utilisez `onboarding@resend.dev` comme email expéditeur
+- Pour la production, vérifiez votre propre domaine
 
 ### Étape 4 : Déployer
 
