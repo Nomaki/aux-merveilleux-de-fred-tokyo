@@ -17,7 +17,8 @@ export const getStripe = () => {
 // Create Payment Intent by calling our backend API
 export const createPaymentIntent = async (
   amount: number,
-  orderData?: any
+  orderData?: any,
+  language?: string
 ): Promise<{ clientSecret: string; paymentIntentId: string }> => {
   try {
     const response = await fetch('/api/create-payment-intent', {
@@ -28,6 +29,7 @@ export const createPaymentIntent = async (
       body: JSON.stringify({
         amount,
         orderData,
+        language: language || 'ja',
       }),
     });
 
@@ -54,19 +56,44 @@ export const createPaymentIntent = async (
   }
 };
 
-export const processPayPay = async (_orderData: any) => {
-  // Mock PayPay processing - in production, this would integrate with PayPay API
-  return new Promise<{ success: boolean; transactionId: string }>((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate 90% success rate
-      if (Math.random() > 0.1) {
-        resolve({
-          success: true,
-          transactionId: `paypay_${Date.now()}`,
-        });
-      } else {
-        reject(new Error('Payment failed'));
+// Process PayPay payment through Stripe
+export const processPayPay = async (
+  amount: number,
+  orderData?: any,
+  language?: string
+): Promise<{ success: boolean; paymentIntentId: string }> => {
+  try {
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount,
+        orderData,
+        language: language || 'ja',
+        paymentMethod: 'paypay',
+      }),
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to create PayPay payment';
+      try {
+        const error = await response.json();
+        errorMessage = error.message || error.error || errorMessage;
+      } catch {
+        errorMessage = response.statusText || errorMessage;
       }
-    }, 2000);
-  });
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      paymentIntentId: data.paymentIntentId,
+    };
+  } catch (error: any) {
+    console.error('Error processing PayPay payment:', error);
+    throw new Error(error.message || 'Failed to process PayPay payment');
+  }
 };

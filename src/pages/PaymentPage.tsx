@@ -57,7 +57,7 @@ export function PaymentPage() {
         0
       );
 
-      createPaymentIntent(amount, order)
+      createPaymentIntent(amount, order, i18n.language)
         .then((result) => {
           setClientSecret(result.clientSecret);
         })
@@ -106,7 +106,12 @@ export function PaymentPage() {
 
     setIsProcessing(true);
     try {
-      const result = await processPayPay(orderData);
+      const amount = orderData.cartItems.reduce(
+        (total: number, item: CartItem) => total + (item.price * item.quantity),
+        0
+      );
+
+      const result = await processPayPay(amount, orderData, i18n.language);
 
       if (result.success) {
         handlePaymentSuccess();

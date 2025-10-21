@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { amount, orderData } = req.body;
+    const { amount, orderData, language = 'ja', paymentMethod = 'card' } = req.body;
 
     // Validate amount
     if (!amount || amount <= 0) {
@@ -20,19 +20,33 @@ export default async function handler(req, res) {
       });
     }
 
-    // Create a PaymentIntent with Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Prepare payment intent configuration
+    const paymentIntentConfig = {
       amount: Math.round(amount), // Amount in smallest currency unit (yen)
       currency: 'jpy', // Japanese Yen
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      // Optional: Add metadata for tracking
       metadata: {
         orderDate: orderData?.deliveryDateTime || new Date().toISOString(),
         customerName: orderData?.nameKanji || 'Unknown',
+        customerEmail: orderData?.email || '',
+        language: language,
+        paymentMethod: paymentMethod,
       },
-    });
+    };
+
+    // Configure payment methods based on the requested method
+    if (paymentMethod === 'paypay') {
+      // Note: PayPay through Stripe requires enabling PayPay in your Stripe dashboard
+      // and may require additional setup for Japanese market
+      paymentIntentConfig.payment_method_types = ['paypay'];
+    } else {
+      // Default: allow all automatic payment methods (cards, etc.)
+      paymentIntentConfig.automatic_payment_methods = {
+        enabled: true,
+      };
+    }
+
+    // Create a PaymentIntent with Stripe
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentConfig);
 
     // Return the client secret to the frontend
     res.status(200).json({
