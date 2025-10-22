@@ -62,31 +62,29 @@ export function Layout() {
 
       <AppShell.Footer>
         <Container size="lg">
-          <Stack gap="md" py="lg">
-            <Group justify="space-between" align="flex-start">
-              <Group align="flex-start" gap="xl">
-                <Image src={iconPng} alt="Icon" style={{ maxWidth: '40px', height: 'auto' }} />
-                <Stack gap={4}>
-                  <Text fw={600} c="dimmed" size="sm">
-                    Aux Merveilleux de Fred
-                  </Text>
-                  <Text c="dimmed" size="xs">
-                    東京都新宿区矢来町107番地2 162-0805
-                  </Text>
-                  <Text c="dimmed" size="xs">
-                    +81 3-5579-8353
-                  </Text>
-                  <Anchor component={Link} to="/scta" size="xs" c="dimmed">
-                    {isJapanese ? '特定商取引法に基づく表記' : 'SCTA Disclosure'}
-                  </Anchor>
-                </Stack>
-              </Group>
-              <Button variant="outline" component="a" href="https://auxmerveilleux.com/ja/contact-us" target="_blank" size="sm">
-                Contact us
-              </Button>
+          <Group justify="space-between" align="flex-start" py="lg">
+            <Group align="flex-start" gap="xl">
+              <Image src={iconPng} alt="Icon" style={{ maxWidth: '40px', height: 'auto' }} />
+              <Stack gap={4}>
+                <Text fw={600} c="dimmed" size="sm">
+                  Aux Merveilleux de Fred
+                </Text>
+                <Text c="dimmed" size="xs">
+                  東京都新宿区矢来町107番地2 162-0805
+                </Text>
+                <Text c="dimmed" size="xs">
+                  +81 3-5579-8353
+                </Text>
+
+                <Anchor component={Link} to="/scta" size="xs" c="dimmed">
+                  {isJapanese ? '特定商取引法に基づく表記' : 'SCTA Disclosure'}
+                </Anchor>
+              </Stack>
             </Group>
-            <Group gap="md" justify="center"></Group>
-          </Stack>
+            <Button variant="outline" component="a" href="https://auxmerveilleux.com/ja/contact-us" target="_blank" size="sm">
+              {isJapanese ? 'お問い合わせ' : 'Contact us'}
+            </Button>
+          </Group>
         </Container>
       </AppShell.Footer>
     </AppShell>

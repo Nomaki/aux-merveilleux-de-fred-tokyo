@@ -1,5 +1,27 @@
 import { useState } from 'react';
-import { Paper, Title, TextInput, Group, Button, Stack, Box, Radio, Card, Image, Text, Textarea, Grid, Alert, Checkbox, Modal, ScrollArea, Anchor, Badge, ActionIcon, Divider } from '@mantine/core';
+import {
+  Paper,
+  Title,
+  TextInput,
+  Group,
+  Button,
+  Stack,
+  Box,
+  Radio,
+  Card,
+  Image,
+  Text,
+  Textarea,
+  Grid,
+  Alert,
+  Checkbox,
+  Modal,
+  ScrollArea,
+  Anchor,
+  Badge,
+  ActionIcon,
+  Divider,
+} from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +92,7 @@ export function ReservationForm() {
       quantity: 1,
     };
 
-    setCart(prev => [...prev, newItem]);
+    setCart((prev) => [...prev, newItem]);
 
     notifications.show({
       title: 'Added to cart',
@@ -80,7 +102,7 @@ export function ReservationForm() {
   };
 
   const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+    setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
   const updateQuantity = (id: string, newQuantity: number) => {
@@ -88,13 +110,11 @@ export function ReservationForm() {
       removeFromCart(id);
       return;
     }
-    setCart(prev => prev.map(item =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
+    setCart((prev) => prev.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)));
   };
 
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const handleSubmit = async (values: CakeOrder) => {
@@ -150,18 +170,20 @@ export function ReservationForm() {
           <Text size="sm">{t('validation.minDate')}</Text>
         </Alert>
 
-        <form onSubmit={form.onSubmit((values) => {
-          // Check if cart has items before submitting
-          if (cart.length === 0) {
-            notifications.show({
-              title: t('cart.empty'),
-              message: t('cart.emptyMessage'),
-              color: 'red',
-            });
-            return;
-          }
-          handleSubmit(values as CakeOrder);
-        })}>
+        <form
+          onSubmit={form.onSubmit((values) => {
+            // Check if cart has items before submitting
+            if (cart.length === 0) {
+              notifications.show({
+                title: t('cart.empty'),
+                message: t('cart.emptyMessage'),
+                color: 'red',
+              });
+              return;
+            }
+            handleSubmit(values as CakeOrder);
+          })}
+        >
           <Stack gap="lg">
             <Grid>
               <Grid.Col span={6}>
@@ -194,7 +216,6 @@ export function ReservationForm() {
                 {t('cart.selectCakes')}
               </Text>
               <Stack gap="md">
-
                 {/* Le Merveilleux */}
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Group justify="space-between" align="flex-start" mb="md">
@@ -205,7 +226,7 @@ export function ReservationForm() {
                         <Text size="sm" c="dimmed">
                           リッチなチョコレートケーキ
                         </Text>
-                        <Text size="sm" fw={500} c="primary" mt="xs">
+                        <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('merveilleux', merveilleuxSize, merveilleuxService).toLocaleString()}
                         </Text>
                       </Box>
@@ -214,7 +235,9 @@ export function ReservationForm() {
 
                   <Grid mb="md">
                     <Grid.Col span={6}>
-                      <Text size="sm" fw={500} mb="xs">{t('cart.size')}</Text>
+                      <Text size="sm" fw={500} mb="xs">
+                        {t('cart.size')}
+                      </Text>
                       <Radio.Group value={merveilleuxSize} onChange={(value) => setMerveilleuxSize(value as '4-6' | '6-8')}>
                         <Stack gap="xs">
                           <Radio value="4-6" label={`4-6 ${t('cart.persons')}`} />
@@ -223,7 +246,9 @@ export function ReservationForm() {
                       </Radio.Group>
                     </Grid.Col>
                     <Grid.Col span={6}>
-                      <Text size="sm" fw={500} mb="xs">{t('cart.service')}</Text>
+                      <Text size="sm" fw={500} mb="xs">
+                        {t('cart.service')}
+                      </Text>
                       <Radio.Group value={merveilleuxService} onChange={(value) => setMerveilleuxService(value as 'takeout' | 'takein')}>
                         <Stack gap="xs">
                           <Radio value="takeout" label={t('cart.takeout')} />
@@ -253,7 +278,7 @@ export function ReservationForm() {
                         <Text size="sm" c="dimmed">
                           驚くべき美味しさのケーキ
                         </Text>
-                        <Text size="sm" fw={500} c="primary" mt="xs">
+                        <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('incroyable', incroyableSize, incroyableService).toLocaleString()}
                         </Text>
                       </Box>
@@ -262,7 +287,9 @@ export function ReservationForm() {
 
                   <Grid mb="md">
                     <Grid.Col span={6}>
-                      <Text size="sm" fw={500} mb="xs">{t('cart.size')}</Text>
+                      <Text size="sm" fw={500} mb="xs">
+                        {t('cart.size')}
+                      </Text>
                       <Radio.Group value={incroyableSize} onChange={(value) => setIncroyableSize(value as '4-6' | '6-8')}>
                         <Stack gap="xs">
                           <Radio value="4-6" label={`4-6 ${t('cart.persons')}`} />
@@ -271,7 +298,9 @@ export function ReservationForm() {
                       </Radio.Group>
                     </Grid.Col>
                     <Grid.Col span={6}>
-                      <Text size="sm" fw={500} mb="xs">{t('cart.service')}</Text>
+                      <Text size="sm" fw={500} mb="xs">
+                        {t('cart.service')}
+                      </Text>
                       <Radio.Group value={incroyableService} onChange={(value) => setIncroyableService(value as 'takeout' | 'takein')}>
                         <Stack gap="xs">
                           <Radio value="takeout" label={t('cart.takeout')} />
@@ -301,19 +330,14 @@ export function ReservationForm() {
                         <Text size="sm" c="dimmed">
                           特別なバースデープレート
                         </Text>
-                        <Text size="sm" fw={500} c="primary" mt="xs">
+                        <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('plate').toLocaleString()}
                         </Text>
                       </Box>
                     </Group>
                   </Group>
 
-                  <Button
-                    leftSection={<IconPlus size={16} />}
-                    onClick={() => addToCart('plate')}
-                    color="primary"
-                    fullWidth
-                  >
+                  <Button leftSection={<IconPlus size={16} />} onClick={() => addToCart('plate')} color="primary" fullWidth>
                     {t('cart.addToCart')}
                   </Button>
                 </Card>
@@ -360,11 +384,7 @@ export function ReservationForm() {
                         </Box>
 
                         <Group gap="xs" align="center">
-                          <ActionIcon
-                            variant="subtle"
-                            color="gray"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >
+                          <ActionIcon variant="subtle" color="gray" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
                             <IconMinus size={16} />
                           </ActionIcon>
 
@@ -372,19 +392,11 @@ export function ReservationForm() {
                             {item.quantity}
                           </Badge>
 
-                          <ActionIcon
-                            variant="subtle"
-                            color="blue"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
+                          <ActionIcon variant="subtle" color="blue" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
                             <IconPlus size={16} />
                           </ActionIcon>
 
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            onClick={() => removeFromCart(item.id)}
-                          >
+                          <ActionIcon variant="subtle" color="red" onClick={() => removeFromCart(item.id)}>
                             <IconTrash size={16} />
                           </ActionIcon>
                         </Group>
@@ -431,13 +443,7 @@ export function ReservationForm() {
             />
 
             <Group justify="center" mt="xl">
-              <Button
-                type="submit"
-                size="lg"
-                loading={isSubmitting}
-                color="primary"
-                disabled={cart.length === 0}
-              >
+              <Button type="submit" size="lg" loading={isSubmitting} color="primary" disabled={cart.length === 0}>
                 {cart.length === 0 ? t('cart.addItemsFirst') : t('form.submitOrder')}
               </Button>
             </Group>
@@ -445,53 +451,54 @@ export function ReservationForm() {
         </form>
       </Paper>
 
-      <Modal
-        opened={termsModalOpen}
-        onClose={() => setTermsModalOpen(false)}
-        title={t('terms.title')}
-        size="lg"
-        centered
-      >
+      <Modal opened={termsModalOpen} onClose={() => setTermsModalOpen(false)} title={t('terms.title')} size="lg" centered>
         <ScrollArea h={400}>
           <Stack gap="md">
             <Title order={3}>{t('terms.mainTitle')}</Title>
 
-            <Text size="sm" fw={500}>1. Reservation Policy</Text>
+            <Text size="sm" fw={500}>
+              1. Reservation Policy
+            </Text>
             <Text size="sm">
-              • All cake orders must be placed at least 48 hours in advance.
-              • Reservations are confirmed only after payment completion.
-              • Custom cake text is limited to 25 characters.
+              • All cake orders must be placed at least 48 hours in advance. • Reservations are confirmed only after payment completion. • Custom cake
+              text is limited to 25 characters.
             </Text>
 
-            <Text size="sm" fw={500}>2. Payment Terms</Text>
+            <Text size="sm" fw={500}>
+              2. Payment Terms
+            </Text>
             <Text size="sm">
-              • Full payment is required at the time of reservation.
-              • We accept major credit cards and digital payments.
-              • Refunds are available up to 24 hours before the delivery date.
+              • Full payment is required at the time of reservation. • We accept major credit cards and digital payments. • Refunds are available up
+              to 24 hours before the delivery date.
             </Text>
 
-            <Text size="sm" fw={500}>3. Delivery Information</Text>
+            <Text size="sm" fw={500}>
+              3. Delivery Information
+            </Text>
             <Text size="sm">
-              • Delivery is available within designated areas.
-              • Delivery times are estimates and may vary due to traffic conditions.
-              • Someone must be available to receive the cake at the specified time.
+              • Delivery is available within designated areas. • Delivery times are estimates and may vary due to traffic conditions. • Someone must
+              be available to receive the cake at the specified time.
             </Text>
 
-            <Text size="sm" fw={500}>4. Cake Quality</Text>
+            <Text size="sm" fw={500}>
+              4. Cake Quality
+            </Text>
             <Text size="sm">
-              • All cakes are made fresh with high-quality ingredients.
-              • Please inform us of any allergies or dietary restrictions.
-              • Cakes should be consumed within 2 days of delivery for best quality.
+              • All cakes are made fresh with high-quality ingredients. • Please inform us of any allergies or dietary restrictions. • Cakes should be
+              consumed within 2 days of delivery for best quality.
             </Text>
 
-            <Text size="sm" fw={500}>5. Cancellation Policy</Text>
+            <Text size="sm" fw={500}>
+              5. Cancellation Policy
+            </Text>
             <Text size="sm">
-              • Cancellations made 24+ hours before delivery: Full refund
-              • Cancellations made 12-24 hours before delivery: 50% refund
-              • Cancellations made less than 12 hours before delivery: No refund
+              • Cancellations made 24+ hours before delivery: Full refund • Cancellations made 12-24 hours before delivery: 50% refund • Cancellations
+              made less than 12 hours before delivery: No refund
             </Text>
 
-            <Text size="sm" fw={500}>6. Contact Information</Text>
+            <Text size="sm" fw={500}>
+              6. Contact Information
+            </Text>
             <Text size="sm">
               For any questions or concerns, please contact us at:
               <br />
