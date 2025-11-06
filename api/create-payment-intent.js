@@ -37,13 +37,14 @@ export default async function handler(req, res) {
       description: description,
       metadata: {
         reservationCode: orderData?.reservationCode || '',
-        orderDate: orderData?.deliveryDateTime || new Date().toISOString(),
-        customerName: customerName,
-        customerNameKatakana: orderData?.familyNameKatakana && orderData?.nameKatakana
-          ? `${orderData.familyNameKatakana} ${orderData.nameKatakana}`
-          : '',
+        deliveryDateTime: orderData?.deliveryDateTime || new Date().toISOString(),
+        familyNameKanji: orderData?.familyNameKanji || '',
+        nameKanji: orderData?.nameKanji || '',
+        familyNameKatakana: orderData?.familyNameKatakana || '',
+        nameKatakana: orderData?.nameKatakana || '',
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phoneNumber || '',
+        cartItems: JSON.stringify(orderData?.cartItems || []),
         language: language,
         paymentMethod: paymentMethod,
       },

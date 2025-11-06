@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Paper,
   Title,
@@ -21,6 +21,7 @@ import {
   Badge,
   ActionIcon,
   Divider,
+  Loader,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -28,7 +29,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { CakeOrder, CartItem } from '../types';
-import { IconCake, IconInfoCircle, IconPlus, IconMinus, IconTrash, IconShoppingCart } from '@tabler/icons-react';
+import { IconCake, IconInfoCircle, IconPlus, IconMinus, IconTrash, IconShoppingCart, IconAlertTriangle, IconCircleCheck } from '@tabler/icons-react';
+import { useOrderCapacity } from '../hooks/useOrderCapacity';
+import { useCalendarCapacity } from '../hooks/useCalendarCapacity';
 import merveilleuxImg from '../assets/merveilleux.png';
 import incroyableImg from '../assets/incroyable.png';
 import plateImg from '../assets/plate.png';
@@ -41,8 +44,16 @@ export function ReservationForm() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [merveilleuxSize, setMerveilleuxSize] = useState<'4-6' | '6-8'>('4-6');
   const [merveilleuxService, setMerveilleuxService] = useState<'takeout' | 'takein'>('takeout');
+  const [merveilleuxText, setMerveilleuxText] = useState('');
   const [incroyableSize, setIncroyableSize] = useState<'4-6' | '6-8'>('4-6');
   const [incroyableService, setIncroyableService] = useState<'takeout' | 'takein'>('takeout');
+  const [incroyableText, setIncroyableText] = useState('');
+  const [plateText, setPlateText] = useState('');
+  const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
+
+  // Order capacity checking
+  const { capacity, isLoading: isCheckingCapacity, checkCapacity } = useOrderCapacity();
+  const { getCapacityForDate, checkMonthCapacity } = useCalendarCapacity();
 
   const form = useForm<CakeOrder>({
     initialValues: {
@@ -52,7 +63,6 @@ export function ReservationForm() {
       familyNameKatakana: '',
       deliveryDateTime: null as any, // No default date - user must select
       cartItems: [],
-      cakeText: '',
       phoneNumber: '',
       email: '',
       acceptTerms: false,
@@ -65,7 +75,14 @@ export function ReservationForm() {
       deliveryDateTime: (value: Date) => {
         if (!value) return t('validation.required');
         const minDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
-        return value < minDate ? t('validation.minDate') : null;
+        if (value < minDate) return t('validation.minDate');
+
+        // Check if date is fully booked
+        if (capacity && !capacity.available) {
+          return t('validation.dateFull');
+        }
+
+        return null;
       },
       phoneNumber: (value: string) => {
         const phoneRegex = /^[\d\-+\(\)\s]+$/;
@@ -75,24 +92,88 @@ export function ReservationForm() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return !emailRegex.test(value) ? t('validation.invalidEmail') : null;
       },
-      cakeText: (value: string) => (value.length > 30 ? t('validation.maxTextLength') : null),
       acceptTerms: (value: boolean) => (!value ? t('validation.acceptTerms') : null),
     },
   });
 
+  // Check capacity when delivery date changes
+  useEffect(() => {
+    if (form.values.deliveryDateTime) {
+      console.log('🔍 Checking capacity for date:', form.values.deliveryDateTime);
+      console.log('📊 Current capacity state:', { isCheckingCapacity, capacity });
+      checkCapacity(form.values.deliveryDateTime);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.values.deliveryDateTime]);
+
+  // Debug logging for capacity changes
+  useEffect(() => {
+    if (capacity) {
+      console.log('✅ Capacity updated:', capacity);
+    }
+  }, [capacity]);
+
+  // Track the current visible month in the calendar
+  const [visibleMonth, setVisibleMonth] = useState<Date>(new Date());
+  const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+
+  // Load capacity data for the current month when component mounts
+  useEffect(() => {
+    if (!hasLoadedInitial) {
+      const currentMonth = new Date();
+      console.log('📅 Loading capacity for current month (initial)');
+      checkMonthCapacity(currentMonth);
+      setHasLoadedInitial(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
+  // Load capacity data when visible month changes (but not on initial mount)
+  useEffect(() => {
+    if (hasLoadedInitial) {
+      console.log('📅 Loading capacity for month:', visibleMonth);
+      checkMonthCapacity(visibleMonth);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleMonth, hasLoadedInitial]);
+
   const addToCart = (cakeType: 'merveilleux' | 'incroyable' | 'plate', cakeSize?: '4-6' | '6-8', serviceType?: 'takeout' | 'takein') => {
     const price = getPrice(cakeType, cakeSize, serviceType);
+
+    // Get the appropriate message based on cake type
+    let cakeText = '';
+    if (cakeType === 'merveilleux') {
+      cakeText = merveilleuxText;
+    } else if (cakeType === 'incroyable') {
+      cakeText = incroyableText;
+    } else if (cakeType === 'plate') {
+      cakeText = plateText;
+    }
+
     const newItem: CartItem = {
       id: Date.now().toString(),
       cakeType,
       cakeSize,
       serviceType,
-      cakeText: form.values.cakeText,
+      cakeText,
       price,
       quantity: 1,
     };
 
     setCart((prev) => [...prev, newItem]);
+
+    // Trigger animation for the new item
+    setAnimatingItemId(newItem.id);
+    setTimeout(() => setAnimatingItemId(null), 500);
+
+    // Clear the message field after adding to cart
+    if (cakeType === 'merveilleux') {
+      setMerveilleuxText('');
+    } else if (cakeType === 'incroyable') {
+      setIncroyableText('');
+    } else if (cakeType === 'plate') {
+      setPlateText('');
+    }
 
     notifications.show({
       title: 'Added to cart',
@@ -148,6 +229,78 @@ export function ReservationForm() {
 
   const minDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
+  // Custom day renderer for calendar with capacity indicators
+  const renderDay = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const capacity = getCapacityForDate(dateObj);
+    const day = dateObj.getDate();
+
+    // Debug logging for first few renders
+    if (day <= 3) {
+      console.log(`🎨 Rendering day ${day}:`, {
+        date: dateObj.toISOString().split('T')[0],
+        hasCapacity: !!capacity,
+        capacity,
+        beforeMinDate: dateObj < minDate,
+      });
+    }
+
+    // Don't show indicators for dates before minDate
+    if (dateObj < minDate) {
+      return <div style={{ padding: '4px' }}>{day}</div>;
+    }
+
+    if (!capacity) {
+      return <div style={{ padding: '4px' }}>{day}</div>;
+    }
+
+    let symbol = '';
+    let color = '';
+
+    if (!capacity.available) {
+      // Full - Red x
+      symbol = 'x';
+      color = '#fa5252';
+    } else if (capacity.remaining <= 5) {
+      // Limited - Orange triangle (▲)
+      symbol = '▲';
+      color = '#fd7e14';
+    } else {
+      // Available - Green circle (●)
+      symbol = '●';
+      color = '#40c057';
+    }
+
+    return (
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '6px',
+        }}
+      >
+        <div>{day}</div>
+        <div
+          style={{
+            position: 'absolute',
+            top: '2px',
+            right: '2px',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            color: color,
+            lineHeight: '1',
+          }}
+        >
+          {symbol}
+        </div>
+      </div>
+    );
+  };
+
   const getPrice = (cakeType: string, size?: string, serviceType?: string) => {
     if (cakeType === 'plate') return 2000;
 
@@ -160,6 +313,20 @@ export function ReservationForm() {
 
   return (
     <Box py={{ base: 'xs', sm: 'xl' }}>
+      <style>
+        {`
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(-10px) scale(0.98);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+        `}
+      </style>
       <Paper shadow="sm" radius="md" px={{ base: 'md', xs: 'xl' }} py="xl">
         <Title order={1} mb="lg" ta="center" c="primary">
           <IconCake size={32} style={{ marginRight: 8 }} />
@@ -203,13 +370,61 @@ export function ReservationForm() {
               </Grid.Col>
             </Grid>
 
-            <DateTimePicker
-              label={t('form.deliveryDateTime')}
-              placeholder={t('form.deliveryDateTime')}
-              required
-              minDate={minDate}
-              {...form.getInputProps('deliveryDateTime')}
-            />
+            <Box>
+              <DateTimePicker
+                label={t('form.deliveryDateTime')}
+                placeholder={t('form.deliveryDateTime')}
+                required
+                minDate={minDate}
+                renderDay={renderDay}
+                value={form.values.deliveryDateTime}
+                onChange={(value) => {
+                  if (value) {
+                    // Convert to Date if string
+                    const dateValue = typeof value === 'string' ? new Date(value) : value;
+                    form.setFieldValue('deliveryDateTime', dateValue);
+                  }
+                }}
+                onMonthSelect={(month) => {
+                  console.log('📅 Month selected:', month);
+                  const monthDate = typeof month === 'string' ? new Date(month) : month;
+                  setVisibleMonth(monthDate);
+                }}
+                error={form.errors.deliveryDateTime}
+              />
+
+              {/* Capacity Status Display */}
+              {form.values.deliveryDateTime && (
+                <Box mt="xs">
+                  {isCheckingCapacity ? (
+                    <Group gap="xs">
+                      <Loader size="xs" />
+                      <Text size="sm" c="dimmed">
+                        {t('form.capacityChecking')}
+                      </Text>
+                    </Group>
+                  ) : capacity ? (
+                    <>
+                      {!capacity.available ? (
+                        <Alert icon={<IconAlertTriangle size={16} />} color="red" variant="light">
+                          <Text size="sm" fw={500}>
+                            {t('form.capacityFull')}
+                          </Text>
+                        </Alert>
+                      ) : capacity.remaining <= 5 ? (
+                        <Alert icon={<IconAlertTriangle size={16} />} color="orange" variant="light">
+                          <Text size="sm">{t('form.capacityLimited', { count: capacity.remaining })}</Text>
+                        </Alert>
+                      ) : (
+                        <Alert icon={<IconCircleCheck size={16} />} color="green" variant="light">
+                          <Text size="sm">{t('form.capacityAvailable')}</Text>
+                        </Alert>
+                      )}
+                    </>
+                  ) : null}
+                </Box>
+              )}
+            </Box>
 
             <Box>
               <Text size="sm" fw={500} mb="xs">
@@ -257,6 +472,17 @@ export function ReservationForm() {
                       </Radio.Group>
                     </Grid.Col>
                   </Grid>
+
+                  <Textarea
+                    label={t('form.cakeText')}
+                    placeholder={t('form.cakeTextPlaceholder')}
+                    description={t('form.cakeTextLimit')}
+                    maxLength={30}
+                    rows={2}
+                    value={merveilleuxText}
+                    onChange={(event) => setMerveilleuxText(event.currentTarget.value)}
+                    mb="md"
+                  />
 
                   <Button
                     leftSection={<IconPlus size={16} />}
@@ -310,6 +536,17 @@ export function ReservationForm() {
                     </Grid.Col>
                   </Grid>
 
+                  <Textarea
+                    label={t('form.cakeText')}
+                    placeholder={t('form.cakeTextPlaceholder')}
+                    description={t('form.cakeTextLimit')}
+                    maxLength={30}
+                    rows={2}
+                    value={incroyableText}
+                    onChange={(event) => setIncroyableText(event.currentTarget.value)}
+                    mb="md"
+                  />
+
                   <Button
                     leftSection={<IconPlus size={16} />}
                     onClick={() => addToCart('incroyable', incroyableSize, incroyableService)}
@@ -337,6 +574,17 @@ export function ReservationForm() {
                     </Group>
                   </Group>
 
+                  <Textarea
+                    label={t('form.cakeText')}
+                    placeholder={t('form.cakeTextPlaceholder')}
+                    description={t('form.cakeTextLimit')}
+                    maxLength={30}
+                    rows={2}
+                    value={plateText}
+                    onChange={(event) => setPlateText(event.currentTarget.value)}
+                    mb="md"
+                  />
+
                   <Button leftSection={<IconPlus size={16} />} onClick={() => addToCart('plate')} color="primary" fullWidth>
                     {t('cart.addToCart')}
                   </Button>
@@ -359,7 +607,16 @@ export function ReservationForm() {
 
                 <Stack gap="sm">
                   {cart.map((item) => (
-                    <Card key={item.id} shadow="sm" padding="md" radius="md" withBorder>
+                    <Card
+                      key={item.id}
+                      shadow="sm"
+                      padding="md"
+                      radius="md"
+                      withBorder
+                      style={{
+                        animation: animatingItemId === item.id ? 'slideIn 0.5s ease-out' : undefined,
+                      }}
+                    >
                       <Group justify="space-between" align="flex-start">
                         <Box flex={1}>
                           <Text fw={500}>{item.cakeType}</Text>
@@ -409,15 +666,6 @@ export function ReservationForm() {
               </Box>
             )}
 
-            <Textarea
-              label={t('form.cakeText')}
-              placeholder={t('form.cakeTextPlaceholder')}
-              description={t('form.cakeTextLimit')}
-              maxLength={30}
-              rows={3}
-              {...form.getInputProps('cakeText')}
-            />
-
             <TextInput label={t('form.phoneNumber')} placeholder="090-1234-5678" required {...form.getInputProps('phoneNumber')} />
 
             <TextInput label={t('form.email')} placeholder="example@email.com" type="email" required {...form.getInputProps('email')} />
@@ -456,56 +704,81 @@ export function ReservationForm() {
           <Stack gap="md">
             <Title order={3}>{t('terms.mainTitle')}</Title>
 
-            <Text size="sm" fw={500}>
-              1. Reservation Policy
-            </Text>
-            <Text size="sm">
-              • All cake orders must be placed at least 48 hours in advance. • Reservations are confirmed only after payment completion. • Custom cake
-              text is limited to 25 characters.
+            <Text size="sm" fw={500} c="dimmed">
+              {t('terms.intro')}
             </Text>
 
-            <Text size="sm" fw={500}>
-              2. Payment Terms
-            </Text>
-            <Text size="sm">
-              • Full payment is required at the time of reservation. • We accept major credit cards and digital payments. • Refunds are available up
-              to 24 hours before the delivery date.
-            </Text>
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.cancellation.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.cancellation.content')}
+              </Text>
+            </Box>
 
-            <Text size="sm" fw={500}>
-              3. Delivery Information
-            </Text>
-            <Text size="sm">
-              • Delivery is available within designated areas. • Delivery times are estimates and may vary due to traffic conditions. • Someone must
-              be available to receive the cake at the specified time.
-            </Text>
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.email.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.email.content')}
+              </Text>
+            </Box>
 
-            <Text size="sm" fw={500}>
-              4. Cake Quality
-            </Text>
-            <Text size="sm">
-              • All cakes are made fresh with high-quality ingredients. • Please inform us of any allergies or dietary restrictions. • Cakes should be
-              consumed within 2 days of delivery for best quality.
-            </Text>
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.plateOnly.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.plateOnly.content')}
+              </Text>
+            </Box>
 
-            <Text size="sm" fw={500}>
-              5. Cancellation Policy
-            </Text>
-            <Text size="sm">
-              • Cancellations made 24+ hours before delivery: Full refund • Cancellations made 12-24 hours before delivery: 50% refund • Cancellations
-              made less than 12 hours before delivery: No refund
-            </Text>
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.arrival.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.arrival.content')}
+              </Text>
+            </Box>
 
-            <Text size="sm" fw={500}>
-              6. Contact Information
-            </Text>
-            <Text size="sm">
-              For any questions or concerns, please contact us at:
-              <br />
-              Email: support@birthdaycakes.com
-              <br />
-              Phone: 090-1234-5678
-            </Text>
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.seating.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.seating.content')}
+              </Text>
+            </Box>
+
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.takeaway.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.takeaway.content')}
+              </Text>
+            </Box>
+
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.additional.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.additional.content')}
+              </Text>
+            </Box>
+
+            <Box>
+              <Text size="sm" fw={600} mb="xs">
+                {t('terms.changes.title')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('terms.changes.content')}
+              </Text>
+            </Box>
           </Stack>
         </ScrollArea>
 

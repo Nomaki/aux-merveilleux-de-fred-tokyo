@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "test:email": "node test-daily-summary.js"
   },
   "dependencies": {
     "@mantine/core": "^8.3.1",
@@ -20,6 +21,7 @@
     "@mantine/notifications": "^8.3.1",
     "@stripe/react-stripe-js": "^4.0.2",
     "@stripe/stripe-js": "^7.9.0",
+    "@supabase/supabase-js": "^2.79.0",
     "@tabler/icons-react": "^3.34.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
@@ -40,6 +42,7 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

@@ -26,7 +26,11 @@
     "cakeTextLimit": "Maximum 25 characters",
     "phoneNumber": "Phone Number",
     "email": "Email Address",
-    "submitOrder": "Review Order"
+    "submitOrder": "Review Order",
+    "capacityChecking": "Checking availability...",
+    "capacityAvailable": "Available",
+    "capacityLimited": "Limited availability ({{count}} spots remaining)",
+    "capacityFull": "This date is fully booked. Please select another date."
   },
   "validation": {
     "required": "This field is required",
@@ -34,7 +38,8 @@
     "invalidPhone": "Please enter a valid phone number",
     "minDate": "Delivery time must be at least 48 hours from now",
     "maxTextLength": "Message must be 30 characters or less",
-    "acceptTerms": "You must accept the terms and conditions"
+    "acceptTerms": "You must accept the terms and conditions",
+    "dateFull": "This date is fully booked. Please select another date."
   },
   "confirmation": {
     "title": "Order Confirmation",
@@ -81,12 +86,39 @@
     "accept": "Accept Terms",
     "close": "Close",
     "agreeText": "I agree to the",
-    "policy1": "1. Reservation Policy",
-    "policy2": "2. Payment Terms",
-    "policy3": "3. Delivery Information",
-    "policy4": "4. Cake Quality",
-    "policy5": "5. Cancellation Policy",
-    "policy6": "6. Contact Information"
+    "intro": "Please read and agree to the following before making your reservation",
+    "cancellation": {
+      "title": "Cancellation Policy",
+      "content": "Cancellations made within 24 hours of your reservation will incur a ¥200 cancellation fee (payable via PayPay)."
+    },
+    "email": {
+      "title": "Email Address",
+      "content": "Please provide a valid email address. If an incorrect address is provided, you will not receive the confirmation email and your reservation cannot be completed."
+    },
+    "plateOnly": {
+      "title": "Plate Only Option",
+      "content": "For the plate-only option, please select your cake in-store on the day of your visit. The price will vary depending on your selection."
+    },
+    "arrival": {
+      "title": "Upon Arrival",
+      "content": "Please inform the staff on the 1st floor of your reservation. For surprise celebrations, please notify the barista on the 3rd floor instead."
+    },
+    "seating": {
+      "title": "Seating",
+      "content": "We do not accept table reservations. During busy periods, there may be a short wait for seating."
+    },
+    "takeaway": {
+      "title": "Takeaway",
+      "content": "If you cannot finish your cake, you are welcome to take it home with you."
+    },
+    "additional": {
+      "title": "Additional Orders",
+      "content": "You may order additional drinks and other items during your visit."
+    },
+    "changes": {
+      "title": "Changes to Reservation",
+      "content": "If you wish to make changes to your reservation, please contact us by email or phone at least 24 hours before your scheduled visit."
+    }
   },
   "loading": "Loading...",
   "errors": {

@@ -15,7 +15,6 @@ export interface CakeOrder {
   familyNameKatakana: string;
   deliveryDateTime: Date;
   cartItems: CartItem[];
-  cakeText: string;
   phoneNumber: string;
   email: string;
   acceptTerms: boolean;
@@ -33,4 +32,30 @@ export type Language = 'ja' | 'en';
 export interface PaymentIntent {
   clientSecret: string;
   paymentIntentId: string;
+}
+
+// Database types for Supabase
+export interface DatabaseOrder {
+  id?: string;
+  reservation_code: string;
+  payment_intent_id: string | null;
+  customer_name_kanji: string;
+  customer_name_katakana: string;
+  email: string;
+  phone_number: string;
+  delivery_date_time: string; // ISO string
+  cart_items: CartItem[];
+  total_amount: number;
+  payment_status: 'pending' | 'completed' | 'failed';
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Order capacity check response
+export interface CapacityResponse {
+  available: boolean;
+  count: number;
+  limit: number;
+  remaining: number;
+  date: string;
 }

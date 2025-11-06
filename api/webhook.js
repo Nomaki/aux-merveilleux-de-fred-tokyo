@@ -1,7 +1,14 @@
 import Stripe from 'stripe';
 import { buffer } from 'micro';
+import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Initialize Supabase client with service role key for server-side operations
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // This is your Stripe webhook secret
 // You'll get this when you set up the webhook in Stripe Dashboard
@@ -45,12 +52,51 @@ export default async function handler(req, res) {
       const paymentIntent = event.data.object;
       console.log('✅ PaymentIntent succeeded:', paymentIntent.id);
 
-      // Here you would:
-      // 1. Update your database with the payment confirmation
-      // 2. Send confirmation email to customer
-      // 3. Update order status
-      // Example:
-      // await updateOrder(paymentIntent.metadata.orderId, { status: 'paid' });
+      try {
+        // Extract order data from payment intent metadata
+        const metadata = paymentIntent.metadata;
+
+        if (!metadata.reservationCode) {
+          console.error('❌ No reservation code in payment intent metadata');
+          break;
+        }
+
+        // Parse cart items from metadata (stored as JSON string)
+        let cartItems = [];
+        try {
+          cartItems = JSON.parse(metadata.cartItems || '[]');
+        } catch (e) {
+          console.error('❌ Failed to parse cart items:', e);
+        }
+
+        // Prepare order data for Supabase
+        const orderData = {
+          reservation_code: metadata.reservationCode,
+          payment_intent_id: paymentIntent.id,
+          customer_name_kanji: `${metadata.familyNameKanji || ''} ${metadata.nameKanji || ''}`.trim(),
+          customer_name_katakana: `${metadata.familyNameKatakana || ''} ${metadata.nameKatakana || ''}`.trim(),
+          email: metadata.customerEmail || paymentIntent.receipt_email || '',
+          phone_number: metadata.customerPhone || '',
+          delivery_date_time: metadata.deliveryDateTime || new Date().toISOString(),
+          cart_items: cartItems,
+          total_amount: paymentIntent.amount,
+          payment_status: 'completed',
+        };
+
+        // Insert order into Supabase
+        const { data, error } = await supabase
+          .from('orders')
+          .insert([orderData])
+          .select();
+
+        if (error) {
+          console.error('❌ Failed to save order to Supabase:', error);
+        } else {
+          console.log('✅ Order saved to Supabase:', data);
+        }
+      } catch (error) {
+        console.error('❌ Error processing payment success:', error);
+      }
 
       break;
 
@@ -58,8 +104,25 @@ export default async function handler(req, res) {
       const failedPayment = event.data.object;
       console.log('❌ PaymentIntent failed:', failedPayment.id);
 
-      // Handle failed payment
-      // Example: Send notification to admin, update order status
+      try {
+        const metadata = failedPayment.metadata;
+
+        if (metadata.reservationCode) {
+          // Update order status to failed if it exists
+          const { error } = await supabase
+            .from('orders')
+            .update({ payment_status: 'failed' })
+            .eq('reservation_code', metadata.reservationCode);
+
+          if (error) {
+            console.error('❌ Failed to update order status:', error);
+          } else {
+            console.log('✅ Order status updated to failed');
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error processing payment failure:', error);
+      }
 
       break;
 
