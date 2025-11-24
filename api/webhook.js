@@ -27,38 +27,47 @@ const supabase = createClient(
 // You'll get this when you set up the webhook in Stripe Dashboard
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Disable body parsing, need raw body for signature verification
+// Vercel handles raw body automatically when bodyParser is disabled
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
+// Helper to read raw body from request
+async function getRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Get the raw body for signature verification
-  // Vercel automatically provides req.body as Buffer for webhooks
-  const buf = req.body;
-  const sig = req.headers['stripe-signature'];
-
-  let event;
-
   try {
-    // Verify the webhook signature
-    if (webhookSecret) {
-      event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-    } else {
-      // For development without webhook secret
-      event = typeof buf === 'string' ? JSON.parse(buf) : buf;
-      console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)');
+    // Get the raw body for signature verification
+    const buf = await getRawBody(req);
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+      // Verify the webhook signature
+      if (webhookSecret) {
+        event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+      } else {
+        // For development without webhook secret
+        event = JSON.parse(buf.toString());
+        console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)');
+      }
+    } catch (err) {
+      console.error('⚠️ Webhook signature verification failed:', err.message);
+      return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
-  } catch (err) {
-    console.error('⚠️ Webhook signature verification failed:', err.message);
-    return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-  }
 
   // Handle the event
   switch (event.type) {
@@ -242,4 +251,8 @@ export default async function handler(req, res) {
 
   // Return a response to acknowledge receipt of the event
   res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('❌ Webhook handler error:', error);
+    return res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
 }
