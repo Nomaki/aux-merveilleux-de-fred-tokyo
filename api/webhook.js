@@ -1,5 +1,4 @@
 import Stripe from 'stripe';
-import { buffer } from 'micro';
 import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -41,7 +40,8 @@ export default async function handler(req, res) {
   }
 
   // Get the raw body for signature verification
-  const buf = await buffer(req);
+  // Vercel automatically provides req.body as Buffer for webhooks
+  const buf = req.body;
   const sig = req.headers['stripe-signature'];
 
   let event;
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
     } else {
       // For development without webhook secret
-      event = JSON.parse(buf.toString());
+      event = typeof buf === 'string' ? JSON.parse(buf) : buf;
       console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)');
     }
   } catch (err) {
@@ -149,6 +149,50 @@ export default async function handler(req, res) {
             email: data[0]?.email,
             total_amount: data[0]?.total_amount,
           });
+
+          // Send confirmation emails after successful order save
+          try {
+            console.log('📧 Sending confirmation emails...');
+
+            // Prepare order data for email
+            const emailOrderData = {
+              familyNameKanji: metadata.familyNameKanji || '',
+              nameKanji: metadata.nameKanji || '',
+              familyNameKatakana: metadata.familyNameKatakana || '',
+              nameKatakana: metadata.nameKatakana || '',
+              email: orderData.email,
+              phoneNumber: orderData.phone_number,
+              deliveryDateTime: orderData.delivery_date_time,
+              cartItems: cartItems,
+              totalAmount: orderData.total_amount,
+            };
+
+            // Call the send confirmation email endpoint
+            const emailResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/send-confirmation-email`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                confirmationData: {
+                  reservationCode: orderData.reservation_code,
+                  order: emailOrderData,
+                },
+                language: metadata.language || 'ja',
+              }),
+            });
+
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json();
+              console.error('❌ Failed to send confirmation email:', errorData);
+            } else {
+              const emailData = await emailResponse.json();
+              console.log('✅ Confirmation emails sent successfully:', emailData);
+            }
+          } catch (emailError) {
+            console.error('❌ Error sending confirmation emails:', emailError);
+            // Don't fail the webhook if email sending fails
+          }
         }
       } catch (error) {
         console.error('❌ Error processing payment success:', error);
