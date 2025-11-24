@@ -37,7 +37,6 @@ export const config = {
   api: {
     bodyParser: false,
   },
-  maxDuration: 60, // Allow up to 60 seconds for this function
 };
 
 // Helper to read raw body from request
