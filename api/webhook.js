@@ -4,10 +4,24 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// Validate Supabase environment variables
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ Missing Supabase environment variables:', {
+    SUPABASE_URL: process.env.SUPABASE_URL ? 'SET' : 'MISSING',
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'MISSING',
+  });
+}
+
 // Initialize Supabase client with service role key for server-side operations
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 // This is your Stripe webhook secret
@@ -84,13 +98,27 @@ export default async function handler(req, res) {
         };
 
         // Insert order into Supabase
+        console.log('🔍 Attempting to insert order:', {
+          reservation_code: orderData.reservation_code,
+          payment_intent_id: orderData.payment_intent_id,
+          email: orderData.email,
+        });
+
         const { data, error } = await supabase
           .from('orders')
           .insert([orderData])
           .select();
 
         if (error) {
-          console.error('❌ Failed to save order to Supabase:', error);
+          console.error('❌ Failed to save order to Supabase:', {
+            error,
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
+          // Log the full error object for debugging
+          console.error('❌ Full Supabase error:', JSON.stringify(error, null, 2));
         } else {
           console.log('✅ Order saved to Supabase:', data);
         }

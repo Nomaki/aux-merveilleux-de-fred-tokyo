@@ -5,10 +5,21 @@ import { generateDailySummaryEmail } from './templates/daily-summary-email.js';
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
 
+// Validate Supabase environment variables
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ Missing Supabase environment variables');
+}
+
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 /**
