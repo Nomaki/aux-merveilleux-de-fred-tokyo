@@ -1,7 +1,6 @@
 import { Resend } from 'resend';
 import { generateConfirmationEmail } from './templates/confirmation-email.js';
 import { generateAdminNotificationEmail } from './templates/admin-notification-email.js';
-import { generateOrderTicketPDF } from './utils/generate-order-ticket-pdf.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
@@ -60,7 +59,7 @@ export default async function handler(req, res) {
 
     console.log('✅ Customer email sent successfully:', data.id);
 
-    // Send admin notification email with PDF attachment
+    // Send admin notification email (without PDF - PDFs will be in daily summary)
     const adminEmailHtml = generateAdminNotificationEmail({
       reservationCode,
       order,
@@ -68,29 +67,11 @@ export default async function handler(req, res) {
 
     const adminSubject = `🔔 新しいご予約 / New Order - ${reservationCode}`;
 
-    // Generate PDF ticket for baker
-    let pdfAttachment = null;
-    try {
-      const pdfBuffer = await generateOrderTicketPDF({
-        reservationCode,
-        order,
-      });
-      pdfAttachment = {
-        filename: `order-ticket-${reservationCode}.pdf`,
-        content: pdfBuffer,
-      };
-      console.log('✅ PDF ticket generated successfully');
-    } catch (pdfError) {
-      console.error('⚠️ Failed to generate PDF ticket:', pdfError);
-      // Continue sending email without attachment if PDF generation fails
-    }
-
     const { data: adminData, error: adminError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'romain.delhoute@gmail.com',
       to: [ADMIN_EMAIL],
       subject: adminSubject,
       html: adminEmailHtml,
-      ...(pdfAttachment && { attachments: [pdfAttachment] }),
     });
 
     if (adminError) {
