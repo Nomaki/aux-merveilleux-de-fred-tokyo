@@ -1,7 +1,12 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
+import { generateConfirmationEmail } from './templates/confirmation-email.js';
+import { generateAdminNotificationEmail } from './templates/admin-notification-email.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
+const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
 
 // Validate Supabase environment variables
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -176,27 +181,51 @@ export default async function handler(req, res) {
               totalAmount: orderData.total_amount,
             };
 
-            // Call the send confirmation email endpoint
-            const emailResponse = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/send-confirmation-email`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                confirmationData: {
-                  reservationCode: orderData.reservation_code,
-                  order: emailOrderData,
-                },
-                language: metadata.language || 'ja',
-              }),
+            const language = metadata.language || 'ja';
+
+            // Send customer confirmation email
+            const customerEmailHtml = generateConfirmationEmail({
+              reservationCode: orderData.reservation_code,
+              order: emailOrderData,
+              language,
             });
 
-            if (!emailResponse.ok) {
-              const errorData = await emailResponse.json();
-              console.error('❌ Failed to send confirmation email:', errorData);
+            const customerSubject = language === 'ja'
+              ? `【ご予約確認】予約番号: ${orderData.reservation_code}`
+              : `Reservation Confirmation - Code: ${orderData.reservation_code}`;
+
+            const { data: customerEmailData, error: customerEmailError } = await resend.emails.send({
+              from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+              to: [orderData.email],
+              subject: customerSubject,
+              html: customerEmailHtml,
+            });
+
+            if (customerEmailError) {
+              console.error('❌ Failed to send customer email:', customerEmailError);
             } else {
-              const emailData = await emailResponse.json();
-              console.log('✅ Confirmation emails sent successfully:', emailData);
+              console.log('✅ Customer email sent:', customerEmailData.id);
+            }
+
+            // Send admin notification email
+            const adminEmailHtml = generateAdminNotificationEmail({
+              reservationCode: orderData.reservation_code,
+              order: emailOrderData,
+            });
+
+            const adminSubject = `🔔 新しいご予約 / New Order - ${orderData.reservation_code}`;
+
+            const { data: adminEmailData, error: adminEmailError } = await resend.emails.send({
+              from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+              to: [ADMIN_EMAIL],
+              subject: adminSubject,
+              html: adminEmailHtml,
+            });
+
+            if (adminEmailError) {
+              console.error('❌ Failed to send admin email:', adminEmailError);
+            } else {
+              console.log('✅ Admin email sent:', adminEmailData.id);
             }
           } catch (emailError) {
             console.error('❌ Error sending confirmation emails:', emailError);
