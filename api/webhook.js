@@ -37,6 +37,7 @@ export const config = {
   api: {
     bodyParser: false,
   },
+  maxDuration: 60, // Allow up to 60 seconds for this function
 };
 
 // Helper to read raw body from request
@@ -49,40 +50,57 @@ async function getRawBody(req) {
 }
 
 export default async function handler(req, res) {
+  // Log immediately to confirm function is invoked
+  console.log('🎯 Webhook handler invoked:', new Date().toISOString());
+  console.log('📥 Request method:', req.method);
+  console.log('📋 Headers:', JSON.stringify(req.headers));
+
   if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    console.log('📖 Reading request body...');
     // Get the raw body for signature verification
     const buf = await getRawBody(req);
+    console.log('✅ Body read successfully, length:', buf.length);
+
     const sig = req.headers['stripe-signature'];
+    console.log('🔑 Stripe signature present:', !!sig);
 
     let event;
 
     try {
       // Verify the webhook signature
       if (webhookSecret) {
+        console.log('🔐 Verifying webhook signature...');
         event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+        console.log('✅ Signature verified, event type:', event.type);
       } else {
         // For development without webhook secret
-        event = JSON.parse(buf.toString());
         console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)');
+        event = JSON.parse(buf.toString());
       }
     } catch (err) {
       console.error('⚠️ Webhook signature verification failed:', err.message);
+      console.error('🔍 Error details:', err);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
   // Handle the event
+  console.log('🔄 Processing event type:', event.type);
+
   switch (event.type) {
     case 'payment_intent.succeeded':
+      console.log('💳 Processing payment_intent.succeeded...');
       const paymentIntent = event.data.object;
       console.log('✅ PaymentIntent succeeded:', paymentIntent.id);
       console.log('💰 Amount:', paymentIntent.amount, 'JPY');
       console.log('📧 Receipt email:', paymentIntent.receipt_email);
 
       try {
+        console.log('📋 Starting order processing...');
         // Extract order data from payment intent metadata
         const metadata = paymentIntent.metadata;
         console.log('📋 Payment metadata:', JSON.stringify(metadata, null, 2));
