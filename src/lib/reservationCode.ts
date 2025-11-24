@@ -1,7 +1,7 @@
 /**
- * Generates a unique reservation code in format: AB1234
+ * Generates a unique reservation code in format: AB123
  * - 2 uppercase letters
- * - 4 digits
+ * - 3 digits
  */
 export function generateReservationCode(): string {
   // Generate 2 random uppercase letters
@@ -9,8 +9,8 @@ export function generateReservationCode(): string {
     String.fromCharCode(65 + Math.floor(Math.random() * 26))
   ).join('');
 
-  // Generate 4 random digits
-  const numbers = Array.from({ length: 4 }, () =>
+  // Generate 3 random digits
+  const numbers = Array.from({ length: 3 }, () =>
     Math.floor(Math.random() * 10)
   ).join('');
 

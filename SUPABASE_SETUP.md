@@ -148,7 +148,7 @@ vercel dev       # Run locally
 
 1. User fills out reservation form
 2. User proceeds to payment page
-3. Payment page generates unique reservation code (format: AB1234)
+3. Payment page generates unique reservation code (format: AB123 - 2 letters + 3 digits)
 4. Payment intent is created with order data in metadata
 5. User completes payment
 6. Stripe webhook fires `payment_intent.succeeded`
@@ -168,7 +168,7 @@ vercel dev       # Run locally
 | Column | Type | Description |
 |--------|------|-------------|
 | `id` | UUID | Primary key, auto-generated |
-| `reservation_code` | TEXT | Unique code (e.g., AB1234) |
+| `reservation_code` | TEXT | Unique code (e.g., AB123) |
 | `payment_intent_id` | TEXT | Stripe payment intent ID |
 | `customer_name_kanji` | TEXT | Customer full name in Kanji |
 | `customer_name_katakana` | TEXT | Customer full name in Katakana |

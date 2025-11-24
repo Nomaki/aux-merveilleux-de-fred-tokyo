@@ -22,6 +22,7 @@ import { IconCreditCard, IconBrandPaypal, IconAlertCircle, IconLock } from '@tab
 import { processPayPay, getStripe, createPaymentIntent } from '../services/stripe';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripePaymentForm } from '../components/StripePaymentForm';
+import { generateReservationCode } from '../lib/reservationCode';
 
 type PaymentMethod = 'card' | 'paypay';
 
@@ -111,9 +112,6 @@ export function PaymentPage() {
     navigate('/success');
   };
 
-  const generateReservationCode = () => {
-    return 'CAKE-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
-  };
 
   const handlePayPayPayment = async () => {
     if (!orderData || !reservationCode) return;
