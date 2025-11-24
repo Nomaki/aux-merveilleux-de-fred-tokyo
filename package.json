@@ -28,6 +28,7 @@
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "micro": "^10.0.1",
+    "pdfkit": "^0.17.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",

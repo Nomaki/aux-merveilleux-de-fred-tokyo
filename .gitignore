@@ -231,6 +231,13 @@ Thumbs.db
 # Add any project-specific files or directories here
 # e.g., config files with sensitive data, build artifacts, etc.
 
+# Test PDF files
+test-order-ticket.pdf
+
+# Font files (large binary files - but keep them in git for deployment)
+# api/fonts/*.ttf
+# api/fonts/*.otf
+
 # Backup files
 *.bak
 *.backup

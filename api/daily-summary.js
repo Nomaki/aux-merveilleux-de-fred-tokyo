@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { generateDailySummaryEmail } from './templates/daily-summary-email.js';
+import { generateDailyTicketsPDF } from './utils/generate-daily-tickets-pdf.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
@@ -70,6 +71,23 @@ export default async function handler(req, res) {
     // Generate email HTML
     const emailHtml = generateDailySummaryEmail(orders || [], jstDate);
 
+    // Generate one PDF with all order tickets
+    const attachments = [];
+    if (orders && orders.length > 0) {
+      console.log('📄 Generating daily tickets PDF...');
+      try {
+        const pdfBuffer = await generateDailyTicketsPDF(orders);
+        const dateStr = jstDate.toISOString().split('T')[0];
+        attachments.push({
+          filename: `daily-tickets-${dateStr}.pdf`,
+          content: pdfBuffer,
+        });
+        console.log(`✅ Generated daily tickets PDF with ${orders.length} orders`);
+      } catch (pdfError) {
+        console.error(`❌ Failed to generate daily tickets PDF:`, pdfError);
+      }
+    }
+
     // Email subject with date
     const dateStr = jstDate.toLocaleDateString('ja-JP', {
       year: 'numeric',
@@ -84,6 +102,7 @@ export default async function handler(req, res) {
       to: [ADMIN_EMAIL],
       subject: subject,
       html: emailHtml,
+      attachments: attachments,
     });
 
     if (emailError) {
