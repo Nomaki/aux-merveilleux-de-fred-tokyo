@@ -65,13 +65,18 @@ export default async function handler(req, res) {
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object;
       console.log('✅ PaymentIntent succeeded:', paymentIntent.id);
+      console.log('💰 Amount:', paymentIntent.amount, 'JPY');
+      console.log('📧 Receipt email:', paymentIntent.receipt_email);
 
       try {
         // Extract order data from payment intent metadata
         const metadata = paymentIntent.metadata;
+        console.log('📋 Payment metadata:', JSON.stringify(metadata, null, 2));
 
         if (!metadata.reservationCode) {
           console.error('❌ No reservation code in payment intent metadata');
+          console.error('❌ This payment will not be saved to the database!');
+          console.error('📋 Full payment intent:', JSON.stringify(paymentIntent, null, 2));
           break;
         }
 
@@ -119,8 +124,31 @@ export default async function handler(req, res) {
           });
           // Log the full error object for debugging
           console.error('❌ Full Supabase error:', JSON.stringify(error, null, 2));
+
+          // CRITICAL: Log the order data so it can be manually recovered
+          console.error('📦 FAILED ORDER DATA (MANUAL RECOVERY REQUIRED):', JSON.stringify(orderData, null, 2));
+
+          // Check for common issues
+          if (error.code === '42501' || error.message?.includes('policy')) {
+            console.error('🔒 RLS POLICY ERROR: Service role might not have permission to insert rows.');
+            console.error('   Run this SQL in Supabase:');
+            console.error('   CREATE POLICY "Service role has full access" ON orders FOR ALL TO service_role USING (true) WITH CHECK (true);');
+          }
+
+          if (error.code === '23505' || error.message?.includes('duplicate')) {
+            console.error('⚠️  DUPLICATE KEY ERROR: An order with this reservation code already exists.');
+          }
+
+          if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.error('⚠️  ENVIRONMENT VARIABLE ERROR: Supabase credentials might not be set in production.');
+          }
         } else {
-          console.log('✅ Order saved to Supabase:', data);
+          console.log('✅ Order saved to Supabase successfully:', {
+            id: data[0]?.id,
+            reservation_code: data[0]?.reservation_code,
+            email: data[0]?.email,
+            total_amount: data[0]?.total_amount,
+          });
         }
       } catch (error) {
         console.error('❌ Error processing payment success:', error);
