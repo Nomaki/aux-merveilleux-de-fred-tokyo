@@ -4,7 +4,7 @@
  */
 export function generateDailySummaryEmail(orders, date) {
   const orderCount = orders.length;
-  const formattedDate = new Date(date).toLocaleDateString('ja-JP', {
+  const formattedDate = new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -33,10 +33,10 @@ export function generateDailySummaryEmail(orders, date) {
         .map((item) => {
           const itemDetails = [
             `<strong>${getCakeDisplayName(item.cakeType)}</strong>`,
-            item.cakeSize ? `サイズ: ${item.cakeSize}人分` : '',
-            item.serviceType ? `${item.serviceType === 'takein' ? '店内' : '持ち帰り'}` : '',
-            item.cakeText ? `メッセージ: "${item.cakeText}"` : '',
-            `数量: ${item.quantity}個`,
+            item.cakeSize ? `Size: ${item.cakeSize} people` : '',
+            item.serviceType ? `${item.serviceType === 'takein' ? 'Dine-in' : 'Takeout'}` : '',
+            item.cakeText ? `Message: "${item.cakeText}"` : '',
+            `Qty: ${item.quantity}`,
           ]
             .filter(Boolean)
             .join(' / ');
@@ -73,17 +73,17 @@ export function generateDailySummaryEmail(orders, date) {
 
   return `
     <!DOCTYPE html>
-    <html lang="ja">
+    <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>本日のご予約一覧</title>
+      <title>Today's Reservations</title>
     </head>
     <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
       <div style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <!-- Header -->
         <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #2196F3;">
-          <h1 style="color: #2196F3; margin: 0; font-size: 28px;">📅 本日のご予約一覧</h1>
+          <h1 style="color: #2196F3; margin: 0; font-size: 28px;">📅 Today's Reservations</h1>
           <p style="color: #666; margin: 10px 0 0 0; font-size: 18px;">${formattedDate}</p>
         </div>
 
@@ -92,12 +92,12 @@ export function generateDailySummaryEmail(orders, date) {
           <div style="display: flex; justify-content: space-around; text-align: center;">
             <div>
               <div style="font-size: 32px; font-weight: bold;">${orderCount}</div>
-              <div style="font-size: 14px; opacity: 0.9;">件のご予約</div>
+              <div style="font-size: 14px; opacity: 0.9;">Reservations</div>
             </div>
             <div style="border-left: 2px solid rgba(255,255,255,0.3); height: 50px;"></div>
             <div>
               <div style="font-size: 32px; font-weight: bold;">¥${totalRevenue.toLocaleString()}</div>
-              <div style="font-size: 14px; opacity: 0.9;">本日の売上合計</div>
+              <div style="font-size: 14px; opacity: 0.9;">Total Revenue</div>
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function generateDailySummaryEmail(orders, date) {
           orderCount === 0
             ? `
           <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
-            <p style="font-size: 18px; color: #666; margin: 0;">本日のご予約はありません。</p>
+            <p style="font-size: 18px; color: #666; margin: 0;">No reservations for today.</p>
           </div>
         `
             : `
@@ -115,12 +115,12 @@ export function generateDailySummaryEmail(orders, date) {
             <table style="width: 100%; border-collapse: collapse; background: white;">
               <thead>
                 <tr style="background: #f5f5f5;">
-                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">お渡し時間</th>
-                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">お客様名</th>
-                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">ご注文内容</th>
-                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">電話番号</th>
-                  <th style="padding: 12px; text-align: center; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">予約番号</th>
-                  <th style="padding: 12px; text-align: right; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">金額</th>
+                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Pickup Time</th>
+                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Customer Name</th>
+                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Order Details</th>
+                  <th style="padding: 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Phone Number</th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Reservation Code</th>
+                  <th style="padding: 12px; text-align: right; font-weight: 600; color: #666; border-bottom: 2px solid #ddd;">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,7 +133,7 @@ export function generateDailySummaryEmail(orders, date) {
 
         <!-- Footer -->
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666; font-size: 12px;">
-          <p style="margin: 0;">このメールは自動送信されています。</p>
+          <p style="margin: 0;">This email is sent automatically.</p>
           <p style="margin: 5px 0 0 0;">Birthday Cake Reservation System</p>
         </div>
       </div>

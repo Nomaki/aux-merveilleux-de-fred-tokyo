@@ -89,12 +89,12 @@ export default async function handler(req, res) {
     }
 
     // Email subject with date
-    const dateStr = jstDate.toLocaleDateString('ja-JP', {
+    const dateStr = jstDate.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-    const subject = `📅 本日のご予約一覧 (${dateStr}) - ${orders?.length || 0}件`;
+    const subject = `📅 Today's Reservations (${dateStr}) - ${orders?.length || 0} orders`;
 
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
