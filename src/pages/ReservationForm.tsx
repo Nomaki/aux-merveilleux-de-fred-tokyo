@@ -420,6 +420,8 @@ export function ReservationForm() {
                 label={t('form.deliveryTime')}
                 placeholder={t('form.selectTime')}
                 data={[
+                  { value: '09:00', label: '09:00' },
+                  { value: '09:30', label: '09:30' },
                   { value: '10:00', label: '10:00' },
                   { value: '10:30', label: '10:30' },
                   { value: '11:00', label: '11:00' },
@@ -437,9 +439,6 @@ export function ReservationForm() {
                   { value: '17:00', label: '17:00' },
                   { value: '17:30', label: '17:30' },
                   { value: '18:00', label: '18:00' },
-                  { value: '18:30', label: '18:30' },
-                  { value: '19:00', label: '19:00' },
-                  { value: '19:30', label: '19:30' },
                 ]}
                 value={selectedTime}
                 onChange={(value) => {
