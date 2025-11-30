@@ -18,6 +18,8 @@
     "nameKatakana": "First Name (Katakana)",
     "familyNameKatakana": "Family Name (Katakana)",
     "deliveryDateTime": "Delivery Date & Time",
+    "deliveryTime": "Delivery Time",
+    "selectTime": "Select a time",
     "cakeType": "Cake Type",
     "cakeTypeChocolate": "Chocolate Cake",
     "cakeTypeVanilla": "Vanilla Cake",

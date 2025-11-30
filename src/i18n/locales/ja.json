@@ -18,6 +18,8 @@
     "nameKatakana": "お名前（カタカナ）",
     "familyNameKatakana": "姓（カタカナ）",
     "deliveryDateTime": "お届け日時",
+    "deliveryTime": "お届け時間",
+    "selectTime": "時間を選択してください",
     "cakeType": "ケーキの種類",
     "cakeTypeChocolate": "チョコレートケーキ",
     "cakeTypeVanilla": "バニラケーキ",

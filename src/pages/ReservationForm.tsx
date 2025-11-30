@@ -22,8 +22,9 @@ import {
   ActionIcon,
   Divider,
   Loader,
+  Select,
 } from '@mantine/core';
-import { DateTimePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,9 @@ export function ReservationForm() {
   // Order capacity checking
   const { capacity, isLoading: isCheckingCapacity, checkCapacity } = useOrderCapacity();
   const { getCapacityForDate, checkMonthCapacity } = useCalendarCapacity();
+
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   const form = useForm<CakeOrder>({
     initialValues: {
@@ -302,13 +306,25 @@ export function ReservationForm() {
   };
 
   const getPrice = (cakeType: string, size?: string, serviceType?: string) => {
-    if (cakeType === 'plate') return 2000;
+    if (cakeType === 'plate') return 500;
 
-    const basePrice = cakeType === 'merveilleux' ? 3500 : 3200; // incroyable base price
-    const sizeMultiplier = size === '6-8' ? 1.4 : 1;
-    const serviceAdjustment = serviceType === 'takein' ? 300 : 0;
+    // Base prices for takeout (Merveilleux and Incroyable have the same prices)
+    const basePrices = {
+      '4-6': 4150,
+      '6-8': 5800,
+    };
 
-    return Math.round(basePrice * sizeMultiplier + serviceAdjustment);
+    const basePrice = basePrices[size as '4-6' | '6-8'] || basePrices['4-6'];
+
+    // Take-in adjustment varies by size
+    let serviceAdjustment = 0;
+    if (serviceType === 'takein') {
+      if (cakeType === 'merveilleux' || cakeType === 'incroyable') {
+        serviceAdjustment = size === '4-6' ? 350 : 300; // 350 for 4-6, 300 for 6-8
+      }
+    }
+
+    return basePrice + serviceAdjustment;
   };
 
   return (
@@ -371,18 +387,25 @@ export function ReservationForm() {
             </Grid>
 
             <Box>
-              <DateTimePicker
+              <DatePickerInput
                 label={t('form.deliveryDateTime')}
                 placeholder={t('form.deliveryDateTime')}
                 required
                 minDate={minDate}
                 renderDay={renderDay}
-                value={form.values.deliveryDateTime}
+                value={selectedDate}
                 onChange={(value) => {
-                  if (value) {
-                    // Convert to Date if string
-                    const dateValue = typeof value === 'string' ? new Date(value) : value;
-                    form.setFieldValue('deliveryDateTime', dateValue);
+                  const dateValue = typeof value === 'string' ? new Date(value) : value;
+                  setSelectedDate(dateValue);
+                  // Update deliveryDateTime when both date and time are selected
+                  if (dateValue && selectedTime) {
+                    const [hours, minutes] = selectedTime.split(':');
+                    const dateTime = new Date(dateValue);
+                    dateTime.setHours(parseInt(hours), parseInt(minutes));
+                    form.setFieldValue('deliveryDateTime', dateTime);
+                  } else if (!dateValue || !selectedTime) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    form.setFieldValue('deliveryDateTime', null as any);
                   }
                 }}
                 onMonthSelect={(month) => {
@@ -391,6 +414,51 @@ export function ReservationForm() {
                   setVisibleMonth(monthDate);
                 }}
                 error={form.errors.deliveryDateTime}
+              />
+
+              <Select
+                label={t('form.deliveryTime')}
+                placeholder={t('form.selectTime')}
+                data={[
+                  { value: '11:00', label: '11:00' },
+                  { value: '11:30', label: '11:30' },
+                  { value: '12:00', label: '12:00' },
+                  { value: '12:30', label: '12:30' },
+                  { value: '13:00', label: '13:00' },
+                  { value: '13:30', label: '13:30' },
+                  { value: '14:00', label: '14:00' },
+                  { value: '14:30', label: '14:30' },
+                  { value: '15:00', label: '15:00' },
+                  { value: '15:30', label: '15:30' },
+                  { value: '16:00', label: '16:00' },
+                  { value: '16:30', label: '16:30' },
+                  { value: '17:00', label: '17:00' },
+                  { value: '17:30', label: '17:30' },
+                  { value: '18:00', label: '18:00' },
+                  { value: '18:30', label: '18:30' },
+                  { value: '19:00', label: '19:00' },
+                  { value: '19:30', label: '19:30' },
+                  { value: '20:00', label: '20:00' },
+                  { value: '20:30', label: '20:30' },
+                  { value: '21:00', label: '21:00' },
+                ]}
+                value={selectedTime}
+                onChange={(value) => {
+                  setSelectedTime(value);
+                  // Update deliveryDateTime when both date and time are selected
+                  if (selectedDate && value) {
+                    const [hours, minutes] = value.split(':');
+                    const dateTime = new Date(selectedDate);
+                    dateTime.setHours(parseInt(hours), parseInt(minutes));
+                    form.setFieldValue('deliveryDateTime', dateTime);
+                  } else if (!selectedDate || !value) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    form.setFieldValue('deliveryDateTime', null as any);
+                  }
+                }}
+                mt="xs"
+                required
+                clearable
               />
 
               {/* Capacity Status Display */}
