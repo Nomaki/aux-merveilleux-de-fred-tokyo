@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
     const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
 
     const supabase = createClient(
