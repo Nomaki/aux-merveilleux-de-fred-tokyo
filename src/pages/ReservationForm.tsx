@@ -420,6 +420,8 @@ export function ReservationForm() {
                 label={t('form.deliveryTime')}
                 placeholder={t('form.selectTime')}
                 data={[
+                  { value: '10:00', label: '10:00' },
+                  { value: '10:30', label: '10:30' },
                   { value: '11:00', label: '11:00' },
                   { value: '11:30', label: '11:30' },
                   { value: '12:00', label: '12:00' },
@@ -438,9 +440,6 @@ export function ReservationForm() {
                   { value: '18:30', label: '18:30' },
                   { value: '19:00', label: '19:00' },
                   { value: '19:30', label: '19:30' },
-                  { value: '20:00', label: '20:00' },
-                  { value: '20:30', label: '20:30' },
-                  { value: '21:00', label: '21:00' },
                 ]}
                 value={selectedTime}
                 onChange={(value) => {
@@ -535,7 +534,7 @@ export function ReservationForm() {
                       <Radio.Group value={merveilleuxService} onChange={(value) => setMerveilleuxService(value as 'takeout' | 'takein')}>
                         <Stack gap="xs">
                           <Radio value="takeout" label={t('cart.takeout')} />
-                          <Radio value="takein" label={t('cart.takein')} />
+                          <Radio value="takein" label={t(merveilleuxSize === '4-6' ? 'cart.takein4to6' : 'cart.takein6to8')} />
                         </Stack>
                       </Radio.Group>
                     </Grid.Col>
@@ -598,7 +597,7 @@ export function ReservationForm() {
                       <Radio.Group value={incroyableService} onChange={(value) => setIncroyableService(value as 'takeout' | 'takein')}>
                         <Stack gap="xs">
                           <Radio value="takeout" label={t('cart.takeout')} />
-                          <Radio value="takein" label={t('cart.takein')} />
+                          <Radio value="takein" label={t(incroyableSize === '4-6' ? 'cart.takein4to6' : 'cart.takein6to8')} />
                         </Stack>
                       </Radio.Group>
                     </Grid.Col>
