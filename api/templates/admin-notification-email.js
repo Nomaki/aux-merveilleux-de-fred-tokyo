@@ -11,7 +11,7 @@ export function generateAdminNotificationEmail(data) {
   // Calculate total
   const total = order.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Format date
+  // Format date with JST timezone
   const deliveryDate = new Date(order.deliveryDateTime);
   const formattedDateJA = deliveryDate.toLocaleDateString('ja-JP', {
     year: 'numeric',
@@ -19,6 +19,7 @@ export function generateAdminNotificationEmail(data) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   });
   const formattedDateEN = deliveryDate.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -26,6 +27,7 @@ export function generateAdminNotificationEmail(data) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   });
 
   // Cake type names

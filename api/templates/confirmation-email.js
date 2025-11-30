@@ -18,7 +18,7 @@ export function generateConfirmationEmail(data) {
   // Calculate total
   const total = order.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Format date
+  // Format date with JST timezone
   const deliveryDate = new Date(order.deliveryDateTime);
   const formattedDate = deliveryDate.toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US', {
     year: 'numeric',
@@ -26,6 +26,7 @@ export function generateConfirmationEmail(data) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   });
 
   // Cake type names
