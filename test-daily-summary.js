@@ -12,16 +12,14 @@ import { generateDailyTicketsPDF } from './api/utils/generate-daily-tickets-pdf.
 config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
+const ADMIN_EMAIL = 'tokyo@auxmerveilleux.com';
 
 async function testDailySummary() {
   try {
     console.log('🧪 Testing daily summary email with 3 mock orders...\n');
 
     // Get today's date in JST timezone
-    const jstDate = new Date(
-      new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' })
-    );
+    const jstDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
 
     // Create 3 mock orders for today
     const orders = [
@@ -98,7 +96,7 @@ async function testDailySummary() {
         time: new Date(order.delivery_date_time).toLocaleTimeString('ja-JP'),
         amount: `¥${order.total_amount.toLocaleString()}`,
       });
-    })
+    });
 
     // Generate email HTML
     const emailHtml = generateDailySummaryEmail(orders || [], jstDate);

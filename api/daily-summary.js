@@ -4,7 +4,7 @@ import { generateDailySummaryEmail } from './templates/daily-summary-email.js';
 import { generateDailyTicketsPDF } from './utils/generate-daily-tickets-pdf.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
+const ADMIN_EMAIL = 'tokyo@auxmerveilleux.com';
 
 // Validate Supabase environment variables
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -12,16 +12,12 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 /**
  * Daily summary endpoint
@@ -31,9 +27,7 @@ const supabase = createClient(
 export default async function handler(req, res) {
   try {
     // Get today's date in JST timezone
-    const jstDate = new Date(
-      new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' })
-    );
+    const jstDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
 
     // Set time to start of day (00:00:00)
     const startOfDay = new Date(jstDate);

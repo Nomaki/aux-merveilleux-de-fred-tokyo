@@ -30,18 +30,14 @@ export default async function handler(req, res) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const resend = new Resend(process.env.RESEND_API_KEY);
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
-    const ADMIN_EMAIL = 'romain.delhoute+amf@gmail.com';
+    const ADMIN_EMAIL = 'tokyo@auxmerveilleux.com';
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
 
     const buf = await getRawBody(req);
     const sig = req.headers['stripe-signature'];
@@ -82,10 +78,7 @@ export default async function handler(req, res) {
       };
 
       console.log('💾 Saving order');
-      const { data, error } = await supabase
-        .from('orders')
-        .insert([orderData])
-        .select();
+      const { data, error } = await supabase.from('orders').insert([orderData]).select();
 
       if (error) {
         console.error('Supabase error:', error);
@@ -116,9 +109,10 @@ export default async function handler(req, res) {
           await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
             to: [orderData.email],
-            subject: language === 'ja'
-              ? `【ご予約確認】予約番号: ${orderData.reservation_code}`
-              : `Reservation Confirmation - Code: ${orderData.reservation_code}`,
+            subject:
+              language === 'ja'
+                ? `【ご予約確認】予約番号: ${orderData.reservation_code}`
+                : `Reservation Confirmation - Code: ${orderData.reservation_code}`,
             html: customerEmailHtml,
           });
 
