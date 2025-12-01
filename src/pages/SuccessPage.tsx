@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { ReservationConfirmation, CartItem } from '../types';
-import { IconCheck, IconCalendar, IconMail, IconCopy, IconHome, IconConfetti } from '@tabler/icons-react';
+import { IconCheck, IconCalendar, IconCopy, IconHome, IconConfetti } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
