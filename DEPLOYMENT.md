@@ -35,20 +35,21 @@ git push origin main
 1. Dans Vercel, allez dans **Settings → Environment Variables**
 2. Ajoutez ces 5 variables :
 
-| Variable Name | Value | Where to find it |
-|--------------|-------|------------------|
-| `VITE_STRIPE_PUBLISHABLE_KEY` | `pk_test_51SGXawJd...` | Stripe Dashboard → Developers → API keys |
-| `STRIPE_SECRET_KEY` | `sk_test_51SGXawJd...` | ⚠️ GARDEZ SECRÈTE |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | On le configurera après |
-| `RESEND_API_KEY` | `re_...` | Resend Dashboard → API Keys |
-| `RESEND_FROM_EMAIL` | `onboarding@resend.dev` | Pour test, ou votre email vérifié |
+| Variable Name                 | Value                     | Where to find it                         |
+| ----------------------------- | ------------------------- | ---------------------------------------- |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | `pk_test_51SGXawJd...`    | Stripe Dashboard → Developers → API keys |
+| `STRIPE_SECRET_KEY`           | `sk_test_51SGXawJd...`    | ⚠️ GARDEZ SECRÈTE                        |
+| `STRIPE_WEBHOOK_SECRET`       | `whsec_...`               | On le configurera après                  |
+| `RESEND_API_KEY`              | `re_...`                  | Resend Dashboard → API Keys              |
+| `RESEND_FROM_EMAIL`           | `order@auxmerveilleux.jp` | Pour test, ou votre email vérifié        |
 
 **Note** : Pour l'instant, laissez `STRIPE_WEBHOOK_SECRET` vide, on le configurera à l'étape 5.
 
 **Pour Resend** :
+
 - Allez sur https://resend.com et créez un compte (gratuit)
 - Dans **API Keys**, créez une nouvelle clé
-- Pour tester, utilisez `onboarding@resend.dev` comme email expéditeur
+- Pour tester, utilisez `order@auxmerveilleux.jp` comme email expéditeur
 - Pour la production, vérifiez votre propre domaine
 
 ### Étape 4 : Déployer
@@ -65,9 +66,11 @@ Vous aurez une URL comme : `https://birthday-reservation-fred.vercel.app`
 Les webhooks permettent à Stripe de confirmer les paiements de manière sécurisée.
 
 1. **Allez dans Stripe Dashboard** :
+
    - https://dashboard.stripe.com/test/webhooks
 
 2. **Créez un nouveau webhook** :
+
    - Cliquez sur **"+ Add endpoint"**
    - URL : `https://VOTRE-APP.vercel.app/api/webhook`
    - Événements à écouter :
@@ -77,6 +80,7 @@ Les webhooks permettent à Stripe de confirmer les paiements de manière sécuri
      - `charge.refunded`
 
 3. **Récupérez la clé secrète du webhook** :
+
    - Après création, cliquez sur le webhook
    - Copiez le "Signing secret" (commence par `whsec_...`)
 
@@ -91,14 +95,15 @@ Les webhooks permettent à Stripe de confirmer les paiements de manière sécuri
 
 Une fois déployé, testez avec ces cartes :
 
-| Carte | Résultat attendu |
-|-------|------------------|
-| `4242 4242 4242 4242` | ✅ Paiement réussi |
-| `4000 0000 0000 0002` | ❌ Carte refusée |
+| Carte                 | Résultat attendu      |
+| --------------------- | --------------------- |
+| `4242 4242 4242 4242` | ✅ Paiement réussi    |
+| `4000 0000 0000 0002` | ❌ Carte refusée      |
 | `4000 0000 0000 9995` | ❌ Fonds insuffisants |
-| `4000 0000 0000 9987` | ❌ Carte perdue |
+| `4000 0000 0000 9987` | ❌ Carte perdue       |
 
 **Pour tous les tests** :
+
 - Date d'expiration : n'importe quelle date future
 - CVC : n'importe quel 3 chiffres
 - Code postal : n'importe quoi
@@ -106,12 +111,14 @@ Une fois déployé, testez avec ces cartes :
 ### Vérifier que tout fonctionne
 
 1. **Frontend** :
+
    - Allez sur votre URL Vercel
    - Créez une commande
    - Testez un paiement avec `4242 4242 4242 4242`
    - ✅ Le paiement devrait réussir
 
 2. **Backend (API)** :
+
    - Ouvrez la console de votre navigateur (F12)
    - Vous devriez voir : `"Payment confirmed successfully"`
 
@@ -162,11 +169,13 @@ Dans Vercel, remplacez les clés test par les clés de production :
 **Symptôme** : Erreur "Failed to create payment intent"
 
 **Solutions** :
+
 1. Vérifiez que `STRIPE_SECRET_KEY` est bien configurée dans Vercel
 2. Regardez les logs Vercel : Dashboard → Functions → Logs
 3. Vérifiez que l'API `/api/create-payment-intent` répond
 
 **Test rapide** :
+
 ```bash
 curl https://VOTRE-APP.vercel.app/api/create-payment-intent \
   -X POST \
@@ -179,6 +188,7 @@ curl https://VOTRE-APP.vercel.app/api/create-payment-intent \
 **Symptôme** : Les paiements passent mais les webhooks ne sont pas déclenchés
 
 **Solutions** :
+
 1. Vérifiez l'URL du webhook dans Stripe Dashboard
 2. Elle doit être : `https://VOTRE-APP.vercel.app/api/webhook`
 3. Testez le webhook avec le bouton "Send test webhook" dans Stripe
@@ -188,6 +198,7 @@ curl https://VOTRE-APP.vercel.app/api/create-payment-intent \
 **Symptôme** : Erreur "CORS policy" dans la console
 
 **Solutions** :
+
 1. Le fichier `vercel.json` est déjà configuré avec les headers CORS
 2. Si le problème persiste, redéployez l'app
 

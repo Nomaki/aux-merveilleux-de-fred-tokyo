@@ -131,7 +131,7 @@ async function testDailySummary() {
 
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
       to: [ADMIN_EMAIL],
       subject: subject,
       html: emailHtml,

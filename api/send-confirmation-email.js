@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
     // Send customer confirmation email
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'romain.delhoute@gmail.com',
+      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
       to: [order.email],
       subject: subject,
       html: emailHtml,
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     const adminSubject = `🔔 新しいご予約 / New Order - ${reservationCode}`;
 
     const { data: adminData, error: adminError } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'romain.delhoute@gmail.com',
+      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
       to: [ADMIN_EMAIL],
       subject: adminSubject,
       html: adminEmailHtml,
