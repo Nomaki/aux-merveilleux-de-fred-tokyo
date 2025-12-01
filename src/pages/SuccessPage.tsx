@@ -1,32 +1,10 @@
 import { useState, useEffect } from 'react';
-import {
-  Paper,
-  Title,
-  Text,
-  Box,
-  Button,
-  Group,
-  Stack,
-  Card,
-  Alert,
-  Center,
-  Divider,
-  CopyButton,
-  ActionIcon,
-  Tooltip,
-} from '@mantine/core';
+import { Paper, Title, Text, Box, Button, Group, Stack, Card, Alert, Center, Divider, CopyButton, ActionIcon, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { ReservationConfirmation, CartItem } from '../types';
-import { 
-  IconCheck, 
-  IconCalendar, 
-  IconMail,
-  IconCopy,
-  IconHome,
-  IconConfetti,
-} from '@tabler/icons-react';
+import { IconCheck, IconCalendar, IconMail, IconCopy, IconHome, IconConfetti } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -34,7 +12,6 @@ export function SuccessPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [confirmation, setConfirmation] = useState<ReservationConfirmation | null>(null);
-  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     const storedConfirmation = localStorage.getItem('reservationConfirmation');
@@ -53,12 +30,6 @@ export function SuccessPage() {
       confirmationData.order.deliveryDateTime = new Date(confirmationData.order.deliveryDateTime);
       confirmationData.createdAt = new Date(confirmationData.createdAt);
       setConfirmation(confirmationData);
-      
-      // Simulate sending confirmation email
-      setTimeout(() => {
-        setEmailSent(true);
-        sendConfirmationEmail(confirmationData);
-      }, 2000);
     } catch (error) {
       notifications.show({
         title: t('errors.networkError'),
@@ -68,41 +39,6 @@ export function SuccessPage() {
       navigate('/');
     }
   }, [navigate, t]);
-
-  const sendConfirmationEmail = async (confirmationData: ReservationConfirmation) => {
-    try {
-      const response = await fetch('/api/send-confirmation-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          confirmationData,
-          language: i18n.language,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-
-      const data = await response.json();
-      console.log('Email sent:', data);
-
-      notifications.show({
-        title: t('success.emailSent'),
-        message: `Email sent to ${confirmationData.order.email}`,
-        color: 'green',
-      });
-    } catch (error) {
-      console.error('Error sending email:', error);
-      notifications.show({
-        title: 'Email Error',
-        message: 'Failed to send confirmation email, but your reservation is confirmed.',
-        color: 'orange',
-      });
-    }
-  };
 
   const formatDateTime = (date: Date) => {
     return format(date, 'PPPp', {
@@ -130,7 +66,7 @@ export function SuccessPage() {
   }
 
   const getTotalPrice = () => {
-    return confirmation.order.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return confirmation.order.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const getCakeDisplayName = (cakeType: string) => {
@@ -138,7 +74,7 @@ export function SuccessPage() {
       case 'merveilleux':
         return 'Le Merveilleux';
       case 'incroyable':
-        return 'L\'incroyable';
+        return "L'incroyable";
       case 'plate':
         return 'Birthday Plate';
       default:
@@ -152,7 +88,7 @@ export function SuccessPage() {
         <Center mb="lg">
           <IconConfetti size={48} color="var(--mantine-color-yellow-6)" />
         </Center>
-        
+
         <Title order={1} mb="lg" ta="center" c="primary">
           <IconCheck size={32} style={{ marginRight: 8 }} />
           {t('success.title')}
@@ -160,10 +96,9 @@ export function SuccessPage() {
 
         <Alert color="green" variant="light" mb="lg">
           <Text size="sm" ta="center">
-            {i18n.language === 'ja' 
+            {i18n.language === 'ja'
               ? 'ご注文ありがとうございました！バースデーケーキのご予約が正常に完了いたしました。'
-              : 'Thank you for your order! Your birthday cake reservation has been successfully completed.'
-            }
+              : 'Thank you for your order! Your birthday cake reservation has been successfully completed.'}
           </Text>
         </Alert>
 
@@ -180,22 +115,15 @@ export function SuccessPage() {
               </Box>
               <CopyButton value={confirmation.reservationCode} timeout={2000}>
                 {({ copied, copy }) => (
-                  <Tooltip 
-                    label={copied ? 'Copied!' : 'Copy reservation code'} 
-                    withArrow
-                  >
-                    <ActionIcon
-                      color={copied ? 'teal' : 'gray'}
-                      variant="subtle"
-                      onClick={copy}
-                    >
+                  <Tooltip label={copied ? 'Copied!' : 'Copy reservation code'} withArrow>
+                    <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy}>
                       <IconCopy size={16} />
                     </ActionIcon>
                   </Tooltip>
                 )}
               </CopyButton>
             </Group>
-            
+
             <Alert color="yellow" variant="light">
               <Text size="sm">
                 <IconCalendar size={16} style={{ marginRight: 4 }} />
@@ -208,7 +136,7 @@ export function SuccessPage() {
             <Title order={3} mb="md" c="primary">
               {t('confirmation.orderDetails')}
             </Title>
-            
+
             <Stack gap="md">
               {confirmation.order.cartItems.map((item: CartItem) => (
                 <Card key={item.id} shadow="xs" padding="sm" radius="md" withBorder>
@@ -253,9 +181,7 @@ export function SuccessPage() {
                 <Text size="sm" c="dimmed" style={{ minWidth: 120 }}>
                   {t('success.deliveryTime')}:
                 </Text>
-                <Text fw={500}>
-                  {formatDateTime(confirmation.order.deliveryDateTime)}
-                </Text>
+                <Text fw={500}>{formatDateTime(confirmation.order.deliveryDateTime)}</Text>
               </Group>
 
               <Group>
@@ -267,36 +193,19 @@ export function SuccessPage() {
             </Stack>
           </Card>
 
-          {emailSent && (
-            <Alert color="blue" variant="light">
-              <Group>
-                <IconMail size={16} />
-                <Text size="sm">
-                  {t('success.emailSent')} ({confirmation.order.email})
-                </Text>
-              </Group>
-            </Alert>
-          )}
-
           <Divider />
 
           <Center>
-            <Button
-              leftSection={<IconHome size={16} />}
-              size="lg"
-              variant="outline"
-              onClick={handleNewOrder}
-            >
+            <Button leftSection={<IconHome size={16} />} size="lg" variant="outline" onClick={handleNewOrder}>
               {i18n.language === 'ja' ? '新しい注文' : 'New Order'}
             </Button>
           </Center>
 
           <Card shadow="sm" padding="md" radius="md" withBorder bg="var(--mantine-color-gray-0)">
             <Text size="xs" c="dimmed" ta="center">
-              {i18n.language === 'ja' 
+              {i18n.language === 'ja'
                 ? 'ご不明な点がございましたら、予約番号をお控えの上お問い合わせください。'
-                : 'If you have any questions, please contact us with your reservation code.'
-              }
+                : 'If you have any questions, please contact us with your reservation code.'}
             </Text>
           </Card>
         </Stack>
