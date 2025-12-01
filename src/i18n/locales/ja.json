@@ -25,7 +25,7 @@
     "cakeTypeVanilla": "バニラケーキ",
     "cakeText": "ケーキに書くメッセージ",
     "cakeTextPlaceholder": "お誕生日おめでとう！",
-    "cakeTextLimit": "最大25文字",
+    "cakeTextLimit": "最大25文字(ロマじだけ)",
     "phoneNumber": "電話番号",
     "email": "メールアドレス",
     "submitOrder": "注文内容を確認",

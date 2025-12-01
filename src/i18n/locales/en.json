@@ -25,7 +25,7 @@
     "cakeTypeVanilla": "Vanilla Cake",
     "cakeText": "Message on Cake",
     "cakeTextPlaceholder": "Happy Birthday!",
-    "cakeTextLimit": "Maximum 25 characters",
+    "cakeTextLimit": "Maximum 25 characters (romaji only)",
     "phoneNumber": "Phone Number",
     "email": "Email Address",
     "submitOrder": "Review Order",
