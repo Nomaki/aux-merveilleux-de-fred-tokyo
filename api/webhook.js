@@ -110,8 +110,10 @@ export default async function handler(req, res) {
             language,
           });
 
+          const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp';
           await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
+            from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
+            replyTo: 'tokyo@auxmerveilleux.com',
             to: [orderData.email],
             subject:
               language === 'ja'
@@ -126,7 +128,8 @@ export default async function handler(req, res) {
           });
 
           await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
+            from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
+            replyTo: 'tokyo@auxmerveilleux.com',
             to: [ADMIN_EMAIL],
             subject: `🔔 New Order - ${orderData.reservation_code}`,
             html: adminEmailHtml,

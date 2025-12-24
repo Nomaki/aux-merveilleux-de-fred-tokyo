@@ -91,8 +91,10 @@ export default async function handler(req, res) {
     const subject = `📅 Today's Reservations (${dateStr}) - ${orders?.length || 0} orders`;
 
     // Send email via Resend
+    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp';
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
+      from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
+      replyTo: 'tokyo@auxmerveilleux.com',
       to: [ADMIN_EMAIL],
       subject: subject,
       html: emailHtml,

@@ -42,8 +42,10 @@ export default async function handler(req, res) {
     const subject = language === 'ja' ? `【ご予約確認】予約番号: ${reservationCode}` : `Reservation Confirmation - Code: ${reservationCode}`;
 
     // Send customer confirmation email
+    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp';
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
+      from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
+      replyTo: 'tokyo@auxmerveilleux.com',
       to: [order.email],
       subject: subject,
       html: emailHtml,
@@ -68,7 +70,8 @@ export default async function handler(req, res) {
     const adminSubject = `🔔 新しいご予約 / New Order - ${reservationCode}`;
 
     const { data: adminData, error: adminError } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp',
+      from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
+      replyTo: 'tokyo@auxmerveilleux.com',
       to: [ADMIN_EMAIL],
       subject: adminSubject,
       html: adminEmailHtml,
