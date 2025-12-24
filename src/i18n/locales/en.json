@@ -18,12 +18,14 @@
     "nameKatakana": "First Name (Katakana)",
     "familyNameKatakana": "Family Name (Katakana)",
     "deliveryDateTime": "Reservation Date",
+    "deliveryDateTimeHint": "Select a date",
     "deliveryTime": "Reservation Time",
     "selectTime": "Select a time",
     "cakeType": "Cake Type",
     "cakeTypeChocolate": "Chocolate Cake",
     "cakeTypeVanilla": "Vanilla Cake",
     "cakeText": "Message on Cake",
+    "plateText": "Message on Plate",
     "cakeTextPlaceholder": "Happy Birthday!",
     "cakeTextLimit": "Maximum 25 characters (romaji only)",
     "phoneNumber": "Phone Number",
@@ -84,43 +86,43 @@
     "each": "each"
   },
   "terms": {
-    "title": "Terms and Conditions",
-    "mainTitle": "Birthday Cake Reservation Terms and Conditions",
+    "title": "Terms & Conditions",
+    "mainTitle": "Birthday Cake Reservation Terms",
     "accept": "Accept Terms",
     "close": "Close",
     "agreeText": "I agree to the",
-    "intro": "Please read and agree to the following before making your reservation",
+    "intro": "Please read and agree to the following terms before making your reservation.",
     "cancellation": {
       "title": "Cancellation Policy",
-      "content": "Cancellations made within 24 hours of your reservation will incur a ¥200 cancellation fee (payable via PayPay)."
+      "content": "If you cancel more than 24 hours before your scheduled visit time, a full refund will be issued to the payment method used at the time of reservation. If you cancel within 24 hours of your scheduled visit time, a full refund will be issued after deducting a 200-yen cancellation fee. All refunds and cancellation fee charges will be processed through the same payment method used at the time of reservation."
     },
     "email": {
       "title": "Email Address",
-      "content": "Please provide a valid email address. If an incorrect address is provided, you will not receive the confirmation email and your reservation cannot be completed."
+      "content": "Please ensure that the email address you enter is valid. If an incorrect email address is provided, the confirmation email may not be delivered, and your reservation will not be completed."
     },
     "plateOnly": {
-      "title": "Plate Only Option",
-      "content": "For the plate-only option, please select your cake in-store on the day of your visit. The price will vary depending on your selection."
+      "title": "Plate-Only Option",
+      "content": "If you choose the \"plate-only\" option, please select your cake at your table on the day of your visit. Prices vary depending on the product you choose on the day."
     },
     "arrival": {
       "title": "Upon Arrival",
-      "content": "Please inform the staff on the 1st floor of your reservation. For surprise celebrations, please notify the barista on the 3rd floor instead."
+      "content": "When you arrive, please inform the staff on the first floor of your reservation details by providing your reservation number."
     },
     "seating": {
       "title": "Seating",
-      "content": "We do not accept table reservations. During busy periods, there may be a short wait for seating."
+      "content": "We do not accept seat reservations. If the café is full, we kindly ask for your patience as there may be a short wait."
     },
     "takeaway": {
-      "title": "Takeaway",
-      "content": "If you cannot finish your cake, you are welcome to take it home with you."
+      "title": "Take-Out",
+      "content": "If you are unable to finish your cake during your visit, the remaining portion may be taken home."
     },
     "additional": {
       "title": "Additional Orders",
-      "content": "You may order additional drinks and other items during your visit."
+      "content": "You may order additional drinks or other items."
     },
     "changes": {
-      "title": "Changes to Reservation",
-      "content": "If you wish to make changes to your reservation, please contact us by email or phone at least 24 hours before your scheduled visit."
+      "title": "Changes to Your Reservation",
+      "content": "If you wish to make changes to your reservation, please contact us by email or phone at least 24 hours before your scheduled visit time."
     }
   },
   "loading": "Loading...",

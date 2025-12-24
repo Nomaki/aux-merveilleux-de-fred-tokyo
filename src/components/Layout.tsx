@@ -124,7 +124,7 @@ export function Layout() {
                     Aux Merveilleux de Fred
                   </Text>
                   <Text c="dimmed" size="xs" style={{ lineHeight: 1.3 }}>
-                    東京都新宿区矢来町107番地2 162-0805
+                    東京都新宿区矢来町107-2 162-0805
                   </Text>
                   <Text c="dimmed" size="xs" style={{ lineHeight: 1.3 }}>
                     +81 3-5579-8353

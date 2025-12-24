@@ -389,7 +389,7 @@ export function ReservationForm() {
             <Box>
               <DatePickerInput
                 label={t('form.deliveryDateTime')}
-                placeholder={t('form.deliveryDateTime')}
+                placeholder={t('form.deliveryDateTimeHint')}
                 required
                 minDate={minDate}
                 renderDay={renderDay}
@@ -505,7 +505,7 @@ export function ReservationForm() {
                       <Box>
                         <Text fw={500}>Le Merveilleux</Text>
                         <Text size="sm" c="dimmed">
-                          リッチなチョコレートケーキ
+                          チョコレートケーキ
                         </Text>
                         <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('merveilleux', merveilleuxSize, merveilleuxService).toLocaleString()}
@@ -568,7 +568,7 @@ export function ReservationForm() {
                       <Box>
                         <Text fw={500}>L'incroyable</Text>
                         <Text size="sm" c="dimmed">
-                          驚くべき美味しさのケーキ
+                          ホワイトチョコレートケーキ
                         </Text>
                         <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('incroyable', incroyableSize, incroyableService).toLocaleString()}
@@ -631,7 +631,7 @@ export function ReservationForm() {
                       <Box>
                         <Text fw={500}>Birthday Plate</Text>
                         <Text size="sm" c="dimmed">
-                          特別なバースデープレート
+                          バースデープレートのみ
                         </Text>
                         <Text size="md" fw={600} c="primary" mt={4}>
                           ¥{getPrice('plate').toLocaleString()}
