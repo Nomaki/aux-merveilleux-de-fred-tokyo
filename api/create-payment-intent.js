@@ -45,6 +45,8 @@ export default async function handler(req, res) {
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phoneNumber || '',
         cartItems: JSON.stringify(orderData?.cartItems || []),
+        candleCount: orderData?.candleCount || '',
+        visitorCount: orderData?.visitorCount || '',
         language: language,
         paymentMethod: paymentMethod,
       },

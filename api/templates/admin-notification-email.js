@@ -137,6 +137,16 @@ export function generateAdminNotificationEmail(data) {
                       📅 ${formattedDateJA}<br>
                       📅 ${formattedDateEN}
                     </p>
+                    ${order.candleCount ? `
+                    <p style="margin: 10px 0 0; font-size: 14px; color: #2c2c2c;">
+                      🕯️ <strong>キャンドル数 / Candles:</strong> ${order.candleCount}
+                    </p>
+                    ` : ''}
+                    ${order.visitorCount ? `
+                    <p style="margin: 5px 0 0; font-size: 14px; color: #2c2c2c;">
+                      👥 <strong>ご来店人数 / Visitors:</strong> ${order.visitorCount}
+                    </p>
+                    ` : ''}
                   </td>
                 </tr>
               </table>

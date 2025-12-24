@@ -74,6 +74,8 @@ export function generateDailyTicketsPDF(orders) {
             phoneNumber: order.phone_number,
             paymentStatus: order.payment_status,
             cartItems: order.cart_items,
+            candleCount: order.candle_count,
+            visitorCount: order.visitor_count,
           },
         });
 
@@ -219,7 +221,24 @@ function drawTicket(doc, x, y, width, height, data) {
   doc.fontSize(5.5);
   drawBoldText(doc, 'PHONE:', x + margin, currentY);
   doc.fontSize(6.5).text(` ${order.phoneNumber}`);
-  currentY += 20;
+  currentY += 10;
+
+  // ===== CANDLES & VISITORS (if available) =====
+  if (order.candleCount || order.visitorCount) {
+    if (order.candleCount) {
+      doc.fontSize(5.5).fillColor('#2c2c2c');
+      drawBoldText(doc, 'CANDLES:', x + margin, currentY);
+      doc.fontSize(6.5).text(` ${order.candleCount}`);
+      currentY += 8;
+    }
+    if (order.visitorCount) {
+      doc.fontSize(5.5).fillColor('#2c2c2c');
+      drawBoldText(doc, 'VISITORS:', x + margin, currentY);
+      doc.fontSize(6.5).text(` ${order.visitorCount}`);
+      currentY += 8;
+    }
+  }
+  currentY += 2;
 
   // ===== PAYMENT STATUS =====
   const statusColor = paymentStatus === 'completed' ? '#28a745' : paymentStatus === 'pending' ? '#ffc107' : '#dc3545';

@@ -34,7 +34,12 @@
     "capacityChecking": "Checking availability...",
     "capacityAvailable": "Available",
     "capacityLimited": "Limited availability ({{count}} spots remaining)",
-    "capacityFull": "This date is fully booked. Please select another date."
+    "capacityFull": "This date is fully booked. Please select another date.",
+    "takeInSection": {
+      "title": "For take in customers only",
+      "candleCount": "Please select the number of desired candles",
+      "visitorCount": "Please select the number of visitors"
+    }
   },
   "validation": {
     "required": "This field is required",

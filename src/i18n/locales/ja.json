@@ -34,7 +34,12 @@
     "capacityChecking": "空き状況を確認中...",
     "capacityAvailable": "予約可能",
     "capacityLimited": "残りわずか（残り{{count}}枠）",
-    "capacityFull": "この日は予約が満席です。別の日付をお選びください。"
+    "capacityFull": "この日は予約が満席です。別の日付をお選びください。",
+    "takeInSection": {
+      "title": "店内利用限定",
+      "candleCount": "ご希望のキャンドルの個数をお選びください",
+      "visitorCount": "ご来店人数をお選びください"
+    }
   },
   "validation": {
     "required": "この項目は必須です",

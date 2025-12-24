@@ -70,6 +70,8 @@ export function ReservationForm() {
       phoneNumber: '',
       email: '',
       acceptTerms: false,
+      candleCount: '',
+      visitorCount: '',
     },
     validate: {
       nameKanji: (value: string) => (value.length === 0 ? t('validation.required') : null),
@@ -685,7 +687,7 @@ export function ReservationForm() {
                     >
                       <Group justify="space-between" align="flex-start">
                         <Box flex={1}>
-                          <Text fw={500}>{item.cakeType}</Text>
+                          <Text fw={500}>{item.cakeType.charAt(0).toUpperCase() + item.cakeType.slice(1)}</Text>
                           {item.cakeSize && (
                             <Text size="sm" c="dimmed">
                               {t('cart.size')}: {item.cakeSize} {t('cart.persons')}
@@ -730,6 +732,42 @@ export function ReservationForm() {
 
                 <Divider my="md" />
               </Box>
+            )}
+
+            {/* Take-in section - shown when cart has take-in items or plate */}
+            {cart.some((item) => item.serviceType === 'takein' || item.cakeType === 'plate') && (
+              <Card shadow="sm" padding="lg" radius="md" withBorder>
+                <Text size="md" fw={600} mb="md">
+                  {t('form.takeInSection.title')}
+                </Text>
+                <Stack gap="md">
+                  <Select
+                    label={t('form.takeInSection.candleCount')}
+                    data={[
+                      { value: '0', label: '0' },
+                      { value: '1', label: '1' },
+                      { value: '2', label: '2' },
+                      { value: '3', label: '3' },
+                      { value: '4', label: '4' },
+                    ]}
+                    {...form.getInputProps('candleCount')}
+                    clearable
+                  />
+                  <Select
+                    label={t('form.takeInSection.visitorCount')}
+                    data={[
+                      { value: '1', label: '1' },
+                      { value: '2', label: '2' },
+                      { value: '3', label: '3' },
+                      { value: '4', label: '4' },
+                      { value: '5', label: '5' },
+                      { value: '6', label: '6' },
+                    ]}
+                    {...form.getInputProps('visitorCount')}
+                    clearable
+                  />
+                </Stack>
+              </Card>
             )}
 
             <TextInput label={t('form.phoneNumber')} placeholder="090-1234-5678" required {...form.getInputProps('phoneNumber')} />

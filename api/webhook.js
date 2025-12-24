@@ -75,6 +75,8 @@ export default async function handler(req, res) {
         cart_items: cartItems,
         total_amount: paymentIntent.amount,
         payment_status: 'completed',
+        candle_count: metadata.candleCount || null,
+        visitor_count: metadata.visitorCount || null,
       };
 
       console.log('💾 Saving order');
@@ -96,6 +98,8 @@ export default async function handler(req, res) {
             deliveryDateTime: orderData.delivery_date_time,
             cartItems: cartItems,
             totalAmount: orderData.total_amount,
+            candleCount: metadata.candleCount || '',
+            visitorCount: metadata.visitorCount || '',
           };
 
           const language = metadata.language || 'ja';

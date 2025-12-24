@@ -151,6 +151,16 @@ export function generateConfirmationEmail(data) {
                       <strong style="color: #2c2c2c;">${isJapanese ? 'お名前' : 'Name'}:</strong><br>
                       ${order.familyNameKanji} ${order.nameKanji}
                     </p>
+                    ${order.candleCount ? `
+                    <p style="margin: 10px 0 0; font-size: 14px; color: #666;">
+                      <strong style="color: #2c2c2c;">${isJapanese ? 'キャンドル数' : 'Candles'}:</strong> ${order.candleCount}
+                    </p>
+                    ` : ''}
+                    ${order.visitorCount ? `
+                    <p style="margin: 10px 0 0; font-size: 14px; color: #666;">
+                      <strong style="color: #2c2c2c;">${isJapanese ? 'ご来店人数' : 'Visitors'}:</strong> ${order.visitorCount}
+                    </p>
+                    ` : ''}
                   </td>
                 </tr>
               </table>

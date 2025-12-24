@@ -45,6 +45,16 @@ export function generateDailySummaryEmail(orders, date) {
         })
         .join('');
 
+      // Add candle and visitor info if available
+      const takeInInfo = [];
+      if (order.candle_count) {
+        takeInInfo.push(`🕯️ Candles: ${order.candle_count}`);
+      }
+      if (order.visitor_count) {
+        takeInInfo.push(`👥 Visitors: ${order.visitor_count}`);
+      }
+      const takeInInfoHtml = takeInInfo.length > 0 ? `<br/><small style="color: #1976d2;">${takeInInfo.join(' | ')}</small>` : '';
+
       return `
         <tr style="border-bottom: 1px solid #e0e0e0;">
           <td style="padding: 12px; font-weight: bold; color: #2196F3;">${deliveryTime}</td>
@@ -56,6 +66,7 @@ export function generateDailySummaryEmail(orders, date) {
             <ul style="margin: 0; padding-left: 20px;">
               ${itemsList}
             </ul>
+            ${takeInInfoHtml}
           </td>
           <td style="padding: 12px;">${order.phone_number}</td>
           <td style="padding: 12px; text-align: center;">

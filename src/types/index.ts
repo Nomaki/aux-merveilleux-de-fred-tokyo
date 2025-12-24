@@ -18,6 +18,9 @@ export interface CakeOrder {
   phoneNumber: string;
   email: string;
   acceptTerms: boolean;
+  // Optional take-in fields
+  candleCount?: string;
+  visitorCount?: string;
 }
 
 export interface ReservationConfirmation {
