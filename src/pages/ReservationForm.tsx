@@ -643,7 +643,7 @@ export function ReservationForm() {
                   </Group>
 
                   <Textarea
-                    label={t('form.cakeText')}
+                    label={t('form.plateText')}
                     placeholder={t('form.cakeTextPlaceholder')}
                     description={t('form.cakeTextLimit')}
                     maxLength={30}
