@@ -71,21 +71,6 @@ export function StripePaymentForm({ amount, onSuccess, onBack }: StripePaymentFo
         </Alert>
       )}
 
-      <Alert icon={<IconAlertCircle size={16} />} color="blue" mt="md">
-        <Text size="sm" fw={500} mb="xs">
-          Mode Test - Cartes Stripe de test :
-        </Text>
-        <Text size="xs">
-          ✓ Succès : 4242 4242 4242 4242<br />
-          ✗ Refusée : 4000 0000 0000 0002<br />
-          ✗ Fonds insuffisants : 4000 0000 0000 9995<br />
-          ✗ Carte perdue : 4000 0000 0000 9987<br />
-          <Text size="xs" c="dimmed" mt="xs">
-            Les erreurs de carte sont maintenant détectées par le backend !
-          </Text>
-        </Text>
-      </Alert>
-
       <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', justifyContent: 'center' }}>
         <Button
           variant="outline"

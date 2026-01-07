@@ -27,7 +27,7 @@
     "cakeText": "Message on Cake",
     "plateText": "Message on Plate",
     "cakeTextPlaceholder": "Happy Birthday!",
-    "cakeTextLimit": "Maximum 25 characters (romaji only)",
+    "cakeTextLimit": "Maximum 30 characters (letters A-Z, numbers 0-9, and spaces only)",
     "phoneNumber": "Phone Number",
     "email": "Email Address",
     "submitOrder": "Review Order",

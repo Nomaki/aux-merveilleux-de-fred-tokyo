@@ -4,11 +4,9 @@ import {
   Title,
   Text,
   Box,
-  Button,
   Group,
   Stack,
   Card,
-  Radio,
   Alert,
   Loader,
   Center,
@@ -18,20 +16,16 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import type { CakeOrder, CartItem } from '../types';
-import { IconCreditCard, IconBrandPaypal, IconAlertCircle, IconLock } from '@tabler/icons-react';
-import { processPayPay, getStripe, createPaymentIntent } from '../services/stripe';
+import { IconAlertCircle, IconLock } from '@tabler/icons-react';
+import { getStripe, createPaymentIntent } from '../services/stripe';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripePaymentForm } from '../components/StripePaymentForm';
 import { generateReservationCode } from '../lib/reservationCode';
-
-type PaymentMethod = 'card' | 'paypay';
 
 export function PaymentPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [orderData, setOrderData] = useState<CakeOrder | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [reservationCode, setReservationCode] = useState<string>('');
   const stripePromise = getStripe();
@@ -112,39 +106,6 @@ export function PaymentPage() {
     navigate('/success');
   };
 
-
-  const handlePayPayPayment = async () => {
-    if (!orderData || !reservationCode) return;
-
-    setIsProcessing(true);
-    try {
-      const amount = orderData.cartItems.reduce(
-        (total: number, item: CartItem) => total + (item.price * item.quantity),
-        0
-      );
-
-      // Add reservation code to order data for Stripe metadata
-      const orderWithReservation = {
-        ...orderData,
-        reservationCode,
-      };
-
-      const result = await processPayPay(amount, orderWithReservation, i18n.language);
-
-      if (result.success) {
-        handlePaymentSuccess();
-      }
-    } catch (error) {
-      notifications.show({
-        title: t('errors.paymentFailed'),
-        message: t('errors.tryAgain'),
-        color: 'red',
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const goBack = () => {
     navigate('/confirmation');
   };
@@ -204,89 +165,21 @@ export function PaymentPage() {
 
           <Divider />
 
-          <Box>
-            <Text size="lg" fw={500} mb="md">
-              {t('payment.selectMethod')}
-            </Text>
-            <Radio.Group
-              value={paymentMethod}
-              onChange={(value) => setPaymentMethod(value as PaymentMethod)}
+          {clientSecret ? (
+            <Elements
+              stripe={stripePromise}
+              options={{ clientSecret }}
             >
-              <Stack gap="md">
-                <Card shadow="sm" padding="lg" radius="md" withBorder>
-                  <Group justify="space-between">
-                    <Group>
-                      <IconCreditCard size={24} />
-                      <Box>
-                        <Text fw={500}>{t('payment.creditCard')}</Text>
-                        <Text size="sm" c="dimmed">
-                          Visa, MasterCard, American Express
-                        </Text>
-                      </Box>
-                    </Group>
-                    <Radio value="card" />
-                  </Group>
-                </Card>
-
-                <Card shadow="sm" padding="lg" radius="md" withBorder>
-                  <Group justify="space-between">
-                    <Group>
-                      <IconBrandPaypal size={24} />
-                      <Box>
-                        <Text fw={500}>{t('payment.paypay')}</Text>
-                        <Text size="sm" c="dimmed">
-                          PayPay簡単決済
-                        </Text>
-                      </Box>
-                    </Group>
-                    <Radio value="paypay" />
-                  </Group>
-                </Card>
-              </Stack>
-            </Radio.Group>
-          </Box>
-
-          <Divider />
-
-          {paymentMethod === 'card' ? (
-            clientSecret ? (
-              <Elements
-                stripe={stripePromise}
-                options={{ clientSecret }}
-              >
-                <StripePaymentForm
-                  amount={getTotalPrice()}
-                  onSuccess={handlePaymentSuccess}
-                  onBack={goBack}
-                />
-              </Elements>
-            ) : (
-              <Center py="xl">
-                <Loader />
-              </Center>
-            )
+              <StripePaymentForm
+                amount={getTotalPrice()}
+                onSuccess={handlePaymentSuccess}
+                onBack={goBack}
+              />
+            </Elements>
           ) : (
-            <Group justify="center" gap="md" mt="xl">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={goBack}
-                disabled={isProcessing}
-              >
-                {t('common.back')}
-              </Button>
-              <Button
-                size="lg"
-                color="primary"
-                onClick={handlePayPayPayment}
-                loading={isProcessing}
-              >
-                {isProcessing
-                  ? t('payment.processing')
-                  : `${price}を支払う`
-                }
-              </Button>
-            </Group>
+            <Center py="xl">
+              <Loader />
+            </Center>
           )}
         </Stack>
       </Paper>

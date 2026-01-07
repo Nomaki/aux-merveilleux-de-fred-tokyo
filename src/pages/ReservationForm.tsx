@@ -548,7 +548,10 @@ export function ReservationForm() {
                     maxLength={30}
                     rows={2}
                     value={merveilleuxText}
-                    onChange={(event) => setMerveilleuxText(event.currentTarget.value)}
+                    onChange={(event) => {
+                      const filtered = event.currentTarget.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                      setMerveilleuxText(filtered);
+                    }}
                     mb="md"
                   />
 
@@ -611,7 +614,10 @@ export function ReservationForm() {
                     maxLength={30}
                     rows={2}
                     value={incroyableText}
-                    onChange={(event) => setIncroyableText(event.currentTarget.value)}
+                    onChange={(event) => {
+                      const filtered = event.currentTarget.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                      setIncroyableText(filtered);
+                    }}
                     mb="md"
                   />
 
@@ -649,7 +655,10 @@ export function ReservationForm() {
                     maxLength={30}
                     rows={2}
                     value={plateText}
-                    onChange={(event) => setPlateText(event.currentTarget.value)}
+                    onChange={(event) => {
+                      const filtered = event.currentTarget.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                      setPlateText(filtered);
+                    }}
                     mb="md"
                   />
 
