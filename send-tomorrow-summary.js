@@ -1,31 +1,27 @@
+/**
+ * Send tomorrow's reservations summary email to a specific address
+ * Run with: node send-tomorrow-summary.js
+ */
+
+import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import { generateDailySummaryEmail } from './templates/daily-summary-email.js';
-import { generateDailyTicketsPDF } from './utils/generate-daily-tickets-pdf.js';
+import { generateDailySummaryEmail } from './api/templates/daily-summary-email.js';
+import { generateDailyTicketsPDF } from './api/utils/generate-daily-tickets-pdf.js';
+
+// Load environment variables
+config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const ADMIN_EMAIL = 'tokyo@auxmerveilleux.com';
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// Validate Supabase environment variables
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('❌ Missing Supabase environment variables');
-}
+// Send to this address instead of admin
+const TEST_EMAIL = 'romain.delhoute@gmail.com';
 
-// Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
-
-/**
- * Daily summary endpoint
- * Fetches all orders for tomorrow (JST timezone) and sends summary email to admin
- * Triggered by Vercel cron job at midnight JST
- */
-export default async function handler(req, res) {
+async function sendTomorrowSummary() {
   try {
+    console.log('📧 Sending tomorrow\'s reservations summary...\n');
+
     // Get today's date in JST timezone
     const jstDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
 
@@ -58,13 +54,21 @@ export default async function handler(req, res) {
 
     if (error) {
       console.error('❌ Supabase query error:', error);
-      return res.status(500).json({
-        error: 'Failed to fetch orders',
-        message: error.message,
-      });
+      return;
     }
 
-    console.log(`✅ Found ${orders?.length || 0} orders for tomorrow`);
+    console.log(`\n✅ Found ${orders?.length || 0} orders for tomorrow\n`);
+
+    if (orders && orders.length > 0) {
+      orders.forEach((order, index) => {
+        console.log(`Order ${index + 1}:`, {
+          code: order.reservation_code,
+          customer: order.customer_name_kanji,
+          time: new Date(order.delivery_date_time).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }),
+          amount: `¥${order.total_amount?.toLocaleString() || 0}`,
+        });
+      });
+    }
 
     // Generate email HTML
     const emailHtml = generateDailySummaryEmail(orders || [], tomorrowDate);
@@ -72,7 +76,7 @@ export default async function handler(req, res) {
     // Generate one PDF with all order tickets
     const attachments = [];
     if (orders && orders.length > 0) {
-      console.log('📄 Generating daily tickets PDF...');
+      console.log('\n📄 Generating daily tickets PDF...');
       try {
         const pdfBuffer = await generateDailyTicketsPDF(orders);
         const dateStr = tomorrowDate.toISOString().split('T')[0];
@@ -94,39 +98,33 @@ export default async function handler(req, res) {
     });
     const subject = `📅 Tomorrow's Reservations (${dateStr}) - ${orders?.length || 0} orders`;
 
+    console.log('\n📧 Sending email...');
+    console.log('Subject:', subject);
+    console.log('To:', TEST_EMAIL);
+
     // Send email via Resend
     const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'order@auxmerveilleux.jp';
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: `Aux Merveilleux de Fred Tokyo <${fromEmail}>`,
       replyTo: 'tokyo@auxmerveilleux.com',
-      to: [ADMIN_EMAIL],
+      to: [TEST_EMAIL],
       subject: subject,
       html: emailHtml,
       attachments: attachments,
     });
 
     if (emailError) {
-      console.error('❌ Failed to send daily summary email:', emailError);
-      return res.status(500).json({
-        error: 'Failed to send email',
-        message: emailError.message,
-      });
+      console.error('\n❌ Failed to send email:', emailError);
+      return;
     }
 
-    console.log('✅ Daily summary email sent successfully:', emailData.id);
-
-    return res.status(200).json({
-      success: true,
-      message: 'Daily summary email sent',
-      orderCount: orders?.length || 0,
-      emailId: emailData.id,
-      date: tomorrowDate.toISOString().split('T')[0],
-    });
+    console.log('\n✅ Email sent successfully!');
+    console.log('Email ID:', emailData.id);
+    console.log('\n✨ Done!\n');
   } catch (error) {
-    console.error('❌ Error in daily summary handler:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-      message: error.message,
-    });
+    console.error('\n❌ Error:', error);
   }
 }
+
+// Run
+sendTomorrowSummary();

@@ -220,25 +220,25 @@ function drawTicket(doc, x, y, width, height, data) {
   // ===== PHONE =====
   doc.fontSize(5.5);
   drawBoldText(doc, 'PHONE:', x + margin, currentY);
-  doc.fontSize(6.5).text(` ${order.phoneNumber}`);
+  currentY += 8;
+  doc.fontSize(6.5).text(order.phoneNumber, x + margin, currentY, { width: contentWidth });
   currentY += 10;
 
   // ===== CANDLES & VISITORS (if available) =====
-  if (order.candleCount || order.visitorCount) {
-    if (order.candleCount) {
-      doc.fontSize(5.5).fillColor('#2c2c2c');
-      drawBoldText(doc, 'CANDLES:', x + margin, currentY);
-      doc.fontSize(6.5).text(` ${order.candleCount}`);
-      currentY += 8;
-    }
-    if (order.visitorCount) {
-      doc.fontSize(5.5).fillColor('#2c2c2c');
-      drawBoldText(doc, 'VISITORS:', x + margin, currentY);
-      doc.fontSize(6.5).text(` ${order.visitorCount}`);
-      currentY += 8;
-    }
+  if (order.candleCount) {
+    doc.fontSize(5.5).fillColor('#2c2c2c');
+    drawBoldText(doc, 'CANDLES:', x + margin, currentY);
+    currentY += 8;
+    doc.fontSize(6.5).text(String(order.candleCount), x + margin, currentY, { width: contentWidth });
+    currentY += 10;
   }
-  currentY += 2;
+  if (order.visitorCount) {
+    doc.fontSize(5.5).fillColor('#2c2c2c');
+    drawBoldText(doc, 'VISITORS:', x + margin, currentY);
+    currentY += 8;
+    doc.fontSize(6.5).text(String(order.visitorCount), x + margin, currentY, { width: contentWidth });
+    currentY += 10;
+  }
 
   // ===== PAYMENT STATUS =====
   const statusColor = paymentStatus === 'completed' ? '#28a745' : paymentStatus === 'pending' ? '#ffc107' : '#dc3545';
