@@ -121,15 +121,16 @@ export function generateDailyTicketsPDF(orders) {
  * Draw a checkbox
  */
 function drawCheckbox(doc, x, y, size = 6) {
-  doc.save().strokeColor('#2c2c2c').lineWidth(0.5).rect(x, y, size, size).stroke().restore();
+  doc.save().strokeColor('#080808').lineWidth(0.5).rect(x, y, size, size).stroke().restore();
 }
 
 /**
- * Helper to draw bold text (simulate with slightly offset text)
+ * Helper to draw bold text (simulate with multiple offset layers)
  */
 function drawBoldText(doc, text, x, y, options = {}) {
   doc.text(text, x, y, options);
-  doc.text(text, x + 0.3, y, options); // Slight offset for bold effect
+  doc.text(text, x + 0.4, y, options);
+  doc.text(text, x + 0.2, y - 0.1, options);
 }
 
 /**
@@ -177,7 +178,7 @@ function drawTicket(doc, x, y, width, height, data) {
   const paymentStatus = order.paymentStatus || 'completed';
 
   // ===== HEADER =====
-  doc.fontSize(8).fillColor('#2c2c2c');
+  doc.fontSize(8).fillColor('#080808');
   drawBoldText(doc, 'ORDER', x + margin, currentY, { width: contentWidth, align: 'center' });
   currentY += 12;
 
@@ -186,95 +187,92 @@ function drawTicket(doc, x, y, width, height, data) {
   const boxY = currentY;
 
   // Draw box background
-  doc.rect(x + margin, boxY, contentWidth, boxHeight).fillAndStroke('#F0D891', '#2c2c2c');
+  doc.rect(x + margin, boxY, contentWidth, boxHeight).fillAndStroke('#F0D891', '#080808');
 
   // Draw reservation code (bold)
-  doc.fillColor('#2c2c2c').fontSize(10);
-  const codeY = boxY + 5;
+  doc.fillColor('#080808').fontSize(12);
+  const codeY = boxY + 3;
   drawBoldText(doc, reservationCode, x + margin, codeY, { width: contentWidth, align: 'center' });
 
   currentY += boxHeight + 2;
 
   // ===== PICKUP =====
-  doc.fillColor('#2c2c2c').fontSize(5.5);
+  doc.fillColor('#080808').fontSize(8);
   drawBoldText(doc, 'PICKUP:', x + margin, currentY);
-  currentY += 7;
-
-  doc.fontSize(5).fillColor('#2c2c2c');
-  doc.fontSize(6.5).text(formattedDate, x + margin, currentY, { width: contentWidth });
-  currentY += 11;
-
-  // ===== CUSTOMER =====
-  doc.fontSize(5.5);
-  drawBoldText(doc, 'CUSTOMER:', x + margin, currentY);
-  currentY += 8;
-
-  doc.fontSize(6.5).fillColor('#2c2c2c');
-  doc.fontSize(6.5).text(`${order.familyNameKanji} ${order.nameKanji}`, x + margin, currentY, { width: contentWidth });
-  currentY += 7.5;
-
-  doc.fontSize(6);
-  doc.text(`${order.familyNameKatakana} ${order.nameKatakana}`, x + margin, currentY, { width: contentWidth });
-  currentY += 9;
-
-  // ===== PHONE =====
-  doc.fontSize(5.5);
-  drawBoldText(doc, 'PHONE:', x + margin, currentY);
-  currentY += 8;
-  doc.fontSize(6.5).text(order.phoneNumber, x + margin, currentY, { width: contentWidth });
   currentY += 10;
 
-  // ===== CANDLES & VISITORS (if available) =====
-  if (order.candleCount) {
-    doc.fontSize(5.5).fillColor('#2c2c2c');
-    drawBoldText(doc, 'CANDLES:', x + margin, currentY);
-    currentY += 8;
-    doc.fontSize(6.5).text(String(order.candleCount), x + margin, currentY, { width: contentWidth });
-    currentY += 10;
-  }
-  if (order.visitorCount) {
-    doc.fontSize(5.5).fillColor('#2c2c2c');
-    drawBoldText(doc, 'VISITORS:', x + margin, currentY);
-    currentY += 8;
-    doc.fontSize(6.5).text(String(order.visitorCount), x + margin, currentY, { width: contentWidth });
-    currentY += 10;
+  doc.fontSize(11).fillColor('#080808');
+  drawBoldText(doc, formattedDate, x + margin, currentY, { width: contentWidth });
+  currentY += 16;
+
+  // ===== CUSTOMER =====
+  doc.fontSize(8).fillColor('#080808');
+  drawBoldText(doc, 'CUSTOMER:', x + margin, currentY);
+  currentY += 10;
+
+  doc.fontSize(11).fillColor('#080808');
+  drawBoldText(doc, `${order.familyNameKanji} ${order.nameKanji}`, x + margin, currentY, { width: contentWidth });
+  currentY += 15;
+
+  doc.fontSize(11).fillColor('#080808');
+  drawBoldText(doc, `${order.familyNameKatakana} ${order.nameKatakana}`, x + margin, currentY, { width: contentWidth });
+  currentY += 16;
+
+  // ===== PHONE =====
+  doc.fontSize(10).fillColor('#080808');
+  drawBoldText(doc, `PHONE:   ${order.phoneNumber}`, x + margin, currentY, { width: contentWidth });
+  currentY += 16;
+
+  // ===== CANDLES & VISITORS (on same line if both exist) =====
+  if (order.candleCount || order.visitorCount) {
+    doc.fontSize(10).fillColor('#080808');
+    if (order.candleCount && order.visitorCount) {
+      // Both on same line
+      drawBoldText(doc, `CANDLES:  ${order.candleCount}    VISITORS:  ${order.visitorCount}`, x + margin, currentY);
+    } else if (order.candleCount) {
+      drawBoldText(doc, `CANDLES:  ${order.candleCount}`, x + margin, currentY);
+    } else {
+      drawBoldText(doc, `VISITORS:  ${order.visitorCount}`, x + margin, currentY);
+    }
+    currentY += 16;
   }
 
   // ===== PAYMENT STATUS =====
-  const statusColor = paymentStatus === 'completed' ? '#28a745' : paymentStatus === 'pending' ? '#ffc107' : '#dc3545';
-  doc.fontSize(5.5).fillColor(statusColor);
-  drawBoldText(doc, getPaymentStatus(paymentStatus), x + margin, currentY);
-  currentY += 13;
+  // const statusColor = paymentStatus === 'completed' ? '#28a745' : paymentStatus === 'pending' ? '#ffc107' : '#dc3545';
+  // doc.fontSize(10).fillColor(statusColor);
+  // drawBoldText(doc, getPaymentStatus(paymentStatus), x + margin, currentY);
+  // currentY += 14;
 
   // ===== ITEMS =====
-  doc.fontSize(5.5).fillColor('#2c2c2c');
+  currentY += 2;
+  doc.fontSize(10).fillColor('#080808');
   drawBoldText(doc, 'ITEMS:', x + margin, currentY);
-  currentY += 11;
+  currentY += 14;
 
   // Separator line
   doc
     .moveTo(x + margin, currentY)
     .lineTo(x + margin + contentWidth, currentY)
     .stroke();
-  currentY += 7;
+  currentY += 6;
 
   // ===== ORDER ITEMS =====
-  const checkboxSize = 6;
-  const checkboxMargin = 3.5;
+  const checkboxSize = 8;
+  const checkboxMargin = 5;
 
   order.cartItems.forEach((item) => {
     const itemY = currentY;
 
     // Draw checkbox aligned with text
-    drawCheckbox(doc, x + margin, itemY + 2, checkboxSize);
+    drawCheckbox(doc, x + margin, itemY + 5, checkboxSize);
 
     // Item name (bold effect)
-    doc.fontSize(5.5).fillColor('#2c2c2c');
+    doc.fontSize(11).fillColor('#080808');
     const itemText = `${item.quantity} x ${getCakeName(item.cakeType)}`;
     drawBoldText(doc, itemText, x + margin + checkboxSize + checkboxMargin, currentY, {
       width: contentWidth - checkboxSize - checkboxMargin,
     });
-    currentY += 7;
+    currentY += 16;
 
     // Details
     const details = [];
@@ -283,30 +281,22 @@ function drawTicket(doc, x, y, width, height, data) {
     else if (item.serviceType === 'takeout') details.push('Takeout');
 
     if (details.length > 0) {
-      doc.fontSize(5.5).fillColor('#666666');
-      doc.text(`  ${details.join(' • ')}`, x + margin + checkboxSize + checkboxMargin, currentY, {
-        width: contentWidth - checkboxSize - checkboxMargin,
+      doc.fontSize(10).fillColor('#080808');
+      drawBoldText(doc, `  ${details.join(' • ')}`, x + margin + checkboxSize, currentY, {
+        width: contentWidth - checkboxSize,
       });
-      currentY += 7;
+      currentY += 14;
     }
 
     // Message
     if (item.cakeText) {
-      doc.fontSize(5.5).fillColor('#666666');
-      doc.text(`  Message: "${item.cakeText}"`, x + margin + checkboxSize + checkboxMargin, currentY, {
-        width: contentWidth - checkboxSize - checkboxMargin,
+      doc.fontSize(10).fillColor('#080808');
+      drawBoldText(doc, `  Msg: "${item.cakeText}"`, x + margin + checkboxSize, currentY, {
+        width: contentWidth - checkboxSize,
       });
-      currentY += 7;
+      currentY += 14;
     }
 
-    currentY += 4.5;
-  });
-
-  // ===== FOOTER =====
-  currentY += 4.5;
-  doc.fontSize(6).fillColor('#999999');
-  doc.text(new Date().toLocaleDateString('en-US'), x + margin, currentY, {
-    width: contentWidth,
-    align: 'center',
+    currentY += 3;
   });
 }
