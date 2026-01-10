@@ -40,7 +40,7 @@ const getCakeName = (type: string) => {
 
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return date.toLocaleTimeString('en-US', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', hour12: false });
 };
 
 const formatPrice = (amount: number) => {

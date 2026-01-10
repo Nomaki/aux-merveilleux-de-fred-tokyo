@@ -145,9 +145,10 @@ function drawTicket(doc, x, y, width, height, data) {
   // Set default font
   doc.font('NotoSans');
 
-  // Format date
+  // Format date in Japan timezone
   const deliveryDate = new Date(order.deliveryDateTime);
   const formattedDate = deliveryDate.toLocaleDateString('en-US', {
+    timeZone: 'Asia/Tokyo',
     month: 'short',
     day: 'numeric',
     year: 'numeric',
