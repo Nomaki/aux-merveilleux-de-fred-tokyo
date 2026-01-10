@@ -59,14 +59,14 @@ export function useAdminAuth() {
       setState({
         isAuthenticated: false,
         isLoading: false,
-        error: data.error || 'Mot de passe incorrect',
+        error: data.error || 'Incorrect password',
       });
       return false;
     } catch {
       setState({
         isAuthenticated: false,
         isLoading: false,
-        error: 'Erreur de connexion au serveur',
+        error: 'Server connection error',
       });
       return false;
     }

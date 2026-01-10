@@ -54,7 +54,7 @@ const getCakeName = (type: string) => {
 
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 };
 
 const formatPrice = (amount: number) => {
@@ -100,11 +100,11 @@ export function AdminDayView() {
           logout();
           navigate('/admin', { replace: true });
         } else {
-          setError('Erreur lors du chargement des commandes');
+          setError('Error loading orders');
         }
       } catch (err) {
         console.error('Error fetching orders:', err);
-        setError('Erreur de connexion au serveur');
+        setError('Server connection error');
       } finally {
         setIsLoading(false);
       }
@@ -130,7 +130,7 @@ export function AdminDayView() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `commandes-${date?.replace(/-/g, '')}.pdf`;
+        a.download = `orders-${date?.replace(/-/g, '')}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -140,11 +140,11 @@ export function AdminDayView() {
         navigate('/admin', { replace: true });
       } else {
         const data = await response.json();
-        setError(data.error || 'Erreur lors du téléchargement');
+        setError(data.error || 'Download error');
       }
     } catch (err) {
       console.error('Error downloading PDF:', err);
-      setError('Erreur de connexion au serveur');
+      setError('Server connection error');
     } finally {
       setIsDownloading(false);
     }
@@ -163,7 +163,7 @@ export function AdminDayView() {
   }
 
   const formattedDate = date
-    ? new Date(date + 'T00:00:00').toLocaleDateString('ja-JP', {
+    ? new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -187,7 +187,7 @@ export function AdminDayView() {
             loading={isDownloading}
             disabled={orders.length === 0}
           >
-            Télécharger PDF
+            Download PDF
           </Button>
         </Group>
 
@@ -203,12 +203,12 @@ export function AdminDayView() {
           </Center>
         ) : orders.length === 0 ? (
           <Center py="xl">
-            <Text c="dimmed">Aucune commande pour cette date</Text>
+            <Text c="dimmed">No orders for this date</Text>
           </Center>
         ) : (
           <Stack gap="md">
             <Text c="dimmed" size="sm">
-              {orders.length} commande{orders.length > 1 ? 's' : ''}
+              {orders.length} order{orders.length > 1 ? 's' : ''}
             </Text>
 
             {orders.map((order) => (
@@ -224,7 +224,7 @@ export function AdminDayView() {
                     </Text>
                   </Group>
                   <Badge color={order.payment_status === 'completed' ? 'green' : 'orange'} variant="filled">
-                    {order.payment_status === 'completed' ? 'Payé' : 'En attente'}
+                    {order.payment_status === 'completed' ? 'Paid' : 'Pending'}
                   </Badge>
                 </Group>
 
@@ -233,7 +233,7 @@ export function AdminDayView() {
                 <Stack gap="xs">
                   <Group>
                     <Text fw={500} w={100}>
-                      Client :
+                      Customer:
                     </Text>
                     <Text>
                       {order.customer_name_kanji} ({order.customer_name_katakana})
@@ -242,14 +242,14 @@ export function AdminDayView() {
 
                   <Group>
                     <Text fw={500} w={100}>
-                      Téléphone :
+                      Phone:
                     </Text>
                     <Text>{order.phone_number}</Text>
                   </Group>
 
                   <Group>
                     <Text fw={500} w={100}>
-                      Email :
+                      Email:
                     </Text>
                     <Text>{order.email}</Text>
                   </Group>
@@ -258,14 +258,14 @@ export function AdminDayView() {
                     <Group>
                       {order.candle_count && (
                         <>
-                          <Text fw={500}>Bougies :</Text>
+                          <Text fw={500}>Candles:</Text>
                           <Text>{order.candle_count}</Text>
                         </>
                       )}
                       {order.visitor_count && (
                         <>
                           <Text fw={500} ml="md">
-                            Visiteurs :
+                            Visitors:
                           </Text>
                           <Text>{order.visitor_count}</Text>
                         </>
@@ -277,7 +277,7 @@ export function AdminDayView() {
                 <Divider my="sm" />
 
                 <Text fw={500} mb="xs">
-                  Articles :
+                  Items:
                 </Text>
                 <Stack gap="xs">
                   {order.cart_items.map((item, index) => (
@@ -288,13 +288,13 @@ export function AdminDayView() {
                             {item.quantity} × {getCakeName(item.cakeType)}
                           </Text>
                           {item.cakeSize && (
-                            <Badge variant="light" color="gray">
+                            <Badge variant="filled" color="violet">
                               {item.cakeSize} pers.
                             </Badge>
                           )}
                           {item.serviceType && (
-                            <Badge variant="light" color={item.serviceType === 'takein' ? 'blue' : 'gray'}>
-                              {item.serviceType === 'takein' ? 'Sur place' : 'À emporter'}
+                            <Badge variant="filled" color={item.serviceType === 'takein' ? 'cyan' : 'pink'}>
+                              {item.serviceType === 'takein' ? 'Dine-in' : 'Takeout'}
                             </Badge>
                           )}
                         </Group>
@@ -302,7 +302,7 @@ export function AdminDayView() {
                       </Group>
                       {item.cakeText && (
                         <Text size="sm" c="dimmed" mt="xs">
-                          Message : "{item.cakeText}"
+                          Message: "{item.cakeText}"
                         </Text>
                       )}
                     </Card>
@@ -313,7 +313,7 @@ export function AdminDayView() {
 
                 <Group justify="flex-end">
                   <Text fw={700} size="lg">
-                    Total : {formatPrice(order.total_amount)}
+                    Total: {formatPrice(order.total_amount)}
                   </Text>
                 </Group>
               </Card>

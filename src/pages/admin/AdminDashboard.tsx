@@ -12,7 +12,7 @@ interface DayCounts {
   };
 }
 
-const WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function AdminDashboard() {
   const { isAuthenticated, isLoading: authLoading, logout, getToken } = useAdminAuth();
@@ -69,7 +69,10 @@ export function AdminDashboard() {
   };
 
   const handleDayClick = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     navigate(`/admin/day/${dateStr}`);
   };
 
@@ -120,16 +123,16 @@ export function AdminDashboard() {
     return null;
   }
 
-  const monthName = currentMonth.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+  const monthName = currentMonth.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   const calendarDays = generateCalendarDays();
 
   return (
     <Container size="md" py="xl">
       <Paper shadow="sm" p="xl" radius="md" withBorder>
         <Group justify="space-between" mb="xl">
-          <Title order={2}>Gestion des commandes</Title>
+          <Title order={2}>Order Management</Title>
           <Button variant="subtle" color="gray" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
-            Déconnexion
+            Logout
           </Button>
         </Group>
 
@@ -211,7 +214,7 @@ export function AdminDashboard() {
               N
             </Badge>
             <Text size="sm" c="dimmed">
-              Toutes payées
+              All paid
             </Text>
           </Group>
           <Group gap="xs">
@@ -219,7 +222,7 @@ export function AdminDashboard() {
               N
             </Badge>
             <Text size="sm" c="dimmed">
-              Paiements en attente
+              Payment pending
             </Text>
           </Group>
         </Group>

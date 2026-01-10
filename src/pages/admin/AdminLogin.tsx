@@ -40,8 +40,8 @@ export function AdminLogin() {
               )}
 
               <PasswordInput
-                label="Mot de passe"
-                placeholder="Entrez le mot de passe"
+                label="Password"
+                placeholder="Enter password"
                 leftSection={<IconLock size={16} />}
                 value={password}
                 onChange={(e) => setPassword(e.currentTarget.value)}
@@ -50,7 +50,7 @@ export function AdminLogin() {
               />
 
               <Button type="submit" fullWidth loading={isLoading} disabled={!password}>
-                Connexion
+                Login
               </Button>
             </Stack>
           </form>
