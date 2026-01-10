@@ -1,20 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Container,
-  Paper,
-  Title,
-  Group,
-  Button,
-  Loader,
-  Center,
-  Badge,
-  Text,
-  Stack,
-  Card,
-  Divider,
-  Alert,
-} from '@mantine/core';
+import { Container, Paper, Title, Group, Button, Loader, Center, Badge, Text, Stack, Card, Divider, Alert } from '@mantine/core';
 import { IconArrowLeft, IconDownload, IconAlertCircle } from '@tabler/icons-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 
@@ -181,12 +167,7 @@ export function AdminDayView() {
             </Button>
             <Title order={2}>{formattedDate}</Title>
           </Group>
-          <Button
-            leftSection={<IconDownload size={16} />}
-            onClick={handleDownloadPDF}
-            loading={isDownloading}
-            disabled={orders.length === 0}
-          >
+          <Button leftSection={<IconDownload size={16} />} onClick={handleDownloadPDF} loading={isDownloading} disabled={orders.length === 0}>
             Download PDF
           </Button>
         </Group>
@@ -219,7 +200,7 @@ export function AdminDayView() {
                       {formatTime(order.delivery_date_time)}
                     </Text>
                     <Text c="dimmed">•</Text>
-                    <Text fw={500} c="dimmed">
+                    <Text fw={800} c="dimmed" size="lg">
                       {order.reservation_code}
                     </Text>
                   </Group>

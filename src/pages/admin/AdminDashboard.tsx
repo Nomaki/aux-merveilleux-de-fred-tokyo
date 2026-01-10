@@ -196,7 +196,7 @@ export function AdminDashboard() {
                         {date.getDate()}
                       </Text>
                       {hasOrders && (
-                        <Badge size="xs" color={allPaid ? 'green' : 'orange'} variant="filled">
+                        <Badge size="md" color={allPaid ? 'green' : 'orange'} variant="filled">
                           {counts.total}
                         </Badge>
                       )}
