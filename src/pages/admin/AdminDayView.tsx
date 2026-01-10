@@ -87,7 +87,7 @@ export function AdminDayView() {
 
       try {
         const token = getToken();
-        const response = await fetch(`/api/admin-orders?date=${date}`, {
+        const response = await fetch(`/api/admin?action=orders&date=${date}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -119,7 +119,7 @@ export function AdminDayView() {
     setIsDownloading(true);
     try {
       const token = getToken();
-      const response = await fetch(`/api/admin-day-pdf?date=${date}`, {
+      const response = await fetch(`/api/admin?action=pdf&date=${date}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

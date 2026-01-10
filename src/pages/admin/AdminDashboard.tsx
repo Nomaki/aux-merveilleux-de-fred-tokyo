@@ -40,7 +40,7 @@ export function AdminDashboard() {
 
       try {
         const token = getToken();
-        const response = await fetch(`/api/admin-orders?month=${monthStr}`, {
+        const response = await fetch(`/api/admin?action=orders&month=${monthStr}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
