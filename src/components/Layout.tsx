@@ -1,5 +1,5 @@
-import { AppShell, Container, Group, Image, Text, Stack, Button, Anchor } from '@mantine/core';
-import { Routes, Route, Link } from 'react-router-dom';
+import { AppShell, Container, Group, Image, Text, Stack, Button, Anchor, Box } from '@mantine/core';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageToggle } from './LanguageToggle';
 import { ReservationForm } from '../pages/ReservationForm';
@@ -7,12 +7,30 @@ import { ConfirmationPage } from '../pages/ConfirmationPage';
 import { PaymentPage } from '../pages/PaymentPage';
 import { SuccessPage } from '../pages/SuccessPage';
 import { SCTAPage } from '../pages/SCTAPage';
+import { AdminLogin } from '../pages/admin/AdminLogin';
+import { AdminDashboard } from '../pages/admin/AdminDashboard';
+import { AdminDayView } from '../pages/admin/AdminDayView';
 import logoSvg from '../assets/logo.svg';
 import iconPng from '../assets/icon.png';
 
 export function Layout() {
   const { i18n } = useTranslation();
+  const location = useLocation();
   const isJapanese = i18n.language === 'ja';
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Admin routes have a simplified layout
+  if (isAdminRoute) {
+    return (
+      <Box bg="#fdf9e7" mih="100vh" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <Routes>
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/day/:date" element={<AdminDayView />} />
+        </Routes>
+      </Box>
+    );
+  }
 
   return (
     <AppShell
