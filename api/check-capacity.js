@@ -84,6 +84,10 @@ export default async function handler(req, res) {
 
     console.log(`✅ Capacity check: ${orderCount}/${DAILY_ORDER_LIMIT} orders`);
 
+    // Cache on CDN edge for 5 minutes, serve stale for 1 minute while revalidating
+    // This dramatically reduces serverless function invocations
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
+
     return res.status(200).json({
       available,
       count: orderCount,

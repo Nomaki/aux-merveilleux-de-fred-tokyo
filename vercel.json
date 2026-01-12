@@ -1,8 +1,28 @@
 {
   "functions": {
-    "api/**/*.js": {
-      "memory": 1024,
+    "api/check-capacity.js": {
+      "memory": 256,
+      "maxDuration": 5
+    },
+    "api/create-payment-intent.js": {
+      "memory": 256,
       "maxDuration": 10
+    },
+    "api/admin.js": {
+      "memory": 1024,
+      "maxDuration": 15
+    },
+    "api/webhook.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/daily-summary.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/send-confirmation-email.js": {
+      "memory": 512,
+      "maxDuration": 15
     }
   },
   "crons": [
