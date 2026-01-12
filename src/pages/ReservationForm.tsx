@@ -32,7 +32,6 @@ import { notifications } from '@mantine/notifications';
 import type { CakeOrder, CartItem } from '../types';
 import { IconCake, IconInfoCircle, IconPlus, IconMinus, IconTrash, IconShoppingCart, IconAlertTriangle, IconCircleCheck } from '@tabler/icons-react';
 import { useOrderCapacity } from '../hooks/useOrderCapacity';
-import { useCalendarCapacity } from '../hooks/useCalendarCapacity';
 import merveilleuxImg from '../assets/merveilleux.png';
 import incroyableImg from '../assets/incroyable.png';
 import plateImg from '../assets/plate.png';
@@ -52,9 +51,8 @@ export function ReservationForm() {
   const [plateText, setPlateText] = useState('');
   const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
 
-  // Order capacity checking
+  // Order capacity checking - only check when user selects a date
   const { capacity, isLoading: isCheckingCapacity, checkCapacity } = useOrderCapacity();
-  const { getCapacityForDate, checkMonthCapacity } = useCalendarCapacity();
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -119,29 +117,6 @@ export function ReservationForm() {
     }
   }, [capacity]);
 
-  // Track the current visible month in the calendar
-  const [visibleMonth, setVisibleMonth] = useState<Date>(new Date());
-  const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
-
-  // Load capacity data for the current month when component mounts
-  useEffect(() => {
-    if (!hasLoadedInitial) {
-      const currentMonth = new Date();
-      console.log('📅 Loading capacity for current month (initial)');
-      checkMonthCapacity(currentMonth);
-      setHasLoadedInitial(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
-
-  // Load capacity data when visible month changes (but not on initial mount)
-  useEffect(() => {
-    if (hasLoadedInitial) {
-      console.log('📅 Loading capacity for month:', visibleMonth);
-      checkMonthCapacity(visibleMonth);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleMonth, hasLoadedInitial]);
 
   const addToCart = (cakeType: 'merveilleux' | 'incroyable' | 'plate', cakeSize?: '4-6' | '6-8', serviceType?: 'takeout' | 'takein') => {
     const price = getPrice(cakeType, cakeSize, serviceType);
@@ -235,77 +210,6 @@ export function ReservationForm() {
 
   const minDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
-  // Custom day renderer for calendar with capacity indicators
-  const renderDay = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    const capacity = getCapacityForDate(dateObj);
-    const day = dateObj.getDate();
-
-    // Debug logging for first few renders
-    if (day <= 3) {
-      console.log(`🎨 Rendering day ${day}:`, {
-        date: dateObj.toISOString().split('T')[0],
-        hasCapacity: !!capacity,
-        capacity,
-        beforeMinDate: dateObj < minDate,
-      });
-    }
-
-    // Don't show indicators for dates before minDate
-    if (dateObj < minDate) {
-      return <div style={{ padding: '4px' }}>{day}</div>;
-    }
-
-    if (!capacity) {
-      return <div style={{ padding: '4px' }}>{day}</div>;
-    }
-
-    let symbol = '';
-    let color = '';
-
-    if (!capacity.available) {
-      // Full - Red x
-      symbol = 'x';
-      color = '#fa5252';
-    } else if (capacity.remaining <= 5) {
-      // Limited - Orange triangle (▲)
-      symbol = '▲';
-      color = '#fd7e14';
-    } else {
-      // Available - Green circle (●)
-      symbol = '●';
-      color = '#40c057';
-    }
-
-    return (
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '6px',
-        }}
-      >
-        <div>{day}</div>
-        <div
-          style={{
-            position: 'absolute',
-            top: '2px',
-            right: '2px',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            color: color,
-            lineHeight: '1',
-          }}
-        >
-          {symbol}
-        </div>
-      </div>
-    );
-  };
 
   const getPrice = (cakeType: string, size?: string, serviceType?: string) => {
     if (cakeType === 'plate') return 500;
@@ -394,7 +298,6 @@ export function ReservationForm() {
                 placeholder={t('form.deliveryDateTimeHint')}
                 required
                 minDate={minDate}
-                renderDay={renderDay}
                 value={selectedDate}
                 onChange={(value) => {
                   const dateValue = typeof value === 'string' ? new Date(value) : value;
@@ -409,11 +312,6 @@ export function ReservationForm() {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     form.setFieldValue('deliveryDateTime', null as any);
                   }
-                }}
-                onMonthSelect={(month) => {
-                  console.log('📅 Month selected:', month);
-                  const monthDate = typeof month === 'string' ? new Date(month) : month;
-                  setVisibleMonth(monthDate);
                 }}
                 error={form.errors.deliveryDateTime}
               />
