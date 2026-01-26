@@ -200,13 +200,14 @@ async function handleReport(req, res) {
     const lastDay = new Date(year, monthNum, 0).getDate();
     const endOfMonth = `${month}-${lastDay}T23:59:59.999Z`;
 
+    // Use created_at (order/payment date) for tax reporting, not delivery_date_time
     const { data: orders, error } = await supabase
       .from('orders')
       .select('*')
       .eq('payment_status', 'completed')
-      .gte('delivery_date_time', startOfMonth)
-      .lte('delivery_date_time', endOfMonth)
-      .order('delivery_date_time', { ascending: true });
+      .gte('created_at', startOfMonth)
+      .lte('created_at', endOfMonth)
+      .order('created_at', { ascending: true });
 
     if (error) {
       console.error('Supabase error:', error);
