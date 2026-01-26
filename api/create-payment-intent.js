@@ -3,6 +3,56 @@ import Stripe from 'stripe';
 // Initialize Stripe with secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// Tax rates in Japan:
+// - Takeout (軽減税率): 8%
+// - Take-in/Dine-in (標準税率): 10%
+const TAX_RATES = {
+  takeout: 0.08,
+  takein: 0.10,
+};
+
+// Calculate tax breakdown from cart items (prices are tax-inclusive)
+function calculateTaxBreakdown(cartItems) {
+  let takeoutTotal = 0;
+  let takeinTotal = 0;
+
+  cartItems.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+    // Birthday plate is always takeout (8%)
+    if (item.cakeType === 'plate' || item.serviceType === 'takeout') {
+      takeoutTotal += itemTotal;
+    } else {
+      takeinTotal += itemTotal;
+    }
+  });
+
+  // Calculate tax amounts (prices are tax-inclusive, so we extract the tax)
+  // Formula: tax = total - (total / (1 + rate)) = total * rate / (1 + rate)
+  const takeoutTax = Math.round(takeoutTotal * TAX_RATES.takeout / (1 + TAX_RATES.takeout));
+  const takeinTax = Math.round(takeinTotal * TAX_RATES.takein / (1 + TAX_RATES.takein));
+
+  const takeoutSubtotal = takeoutTotal - takeoutTax;
+  const takeinSubtotal = takeinTotal - takeinTax;
+
+  return {
+    takeout: {
+      subtotal: takeoutSubtotal,
+      tax: takeoutTax,
+      total: takeoutTotal,
+      rate: '8%',
+    },
+    takein: {
+      subtotal: takeinSubtotal,
+      tax: takeinTax,
+      total: takeinTotal,
+      rate: '10%',
+    },
+    totalSubtotal: takeoutSubtotal + takeinSubtotal,
+    totalTax: takeoutTax + takeinTax,
+    grandTotal: takeoutTotal + takeinTotal,
+  };
+}
+
 export default async function handler(req, res) {
   // Only accept POST requests
   if (req.method !== 'POST') {
@@ -30,6 +80,9 @@ export default async function handler(req, res) {
       ? `Birthday Cake Order - ${orderData.reservationCode} - ${customerName}`
       : `Birthday Cake Order - ${customerName}`;
 
+    // Calculate tax breakdown from cart items
+    const taxBreakdown = calculateTaxBreakdown(orderData?.cartItems || []);
+
     // Prepare payment intent configuration
     const paymentIntentConfig = {
       amount: Math.round(amount), // Amount in smallest currency unit (yen)
@@ -49,6 +102,17 @@ export default async function handler(req, res) {
         visitorCount: orderData?.visitorCount || '',
         language: language,
         paymentMethod: paymentMethod,
+        // Tax breakdown for accounting (prices are tax-inclusive)
+        tax_takeout_subtotal: String(taxBreakdown.takeout.subtotal),
+        tax_takeout_amount: String(taxBreakdown.takeout.tax),
+        tax_takeout_total: String(taxBreakdown.takeout.total),
+        tax_takeout_rate: taxBreakdown.takeout.rate,
+        tax_takein_subtotal: String(taxBreakdown.takein.subtotal),
+        tax_takein_amount: String(taxBreakdown.takein.tax),
+        tax_takein_total: String(taxBreakdown.takein.total),
+        tax_takein_rate: taxBreakdown.takein.rate,
+        tax_total_subtotal: String(taxBreakdown.totalSubtotal),
+        tax_total_tax: String(taxBreakdown.totalTax),
       },
     };
 

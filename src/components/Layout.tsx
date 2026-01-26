@@ -10,6 +10,7 @@ import { SCTAPage } from '../pages/SCTAPage';
 import { AdminLogin } from '../pages/admin/AdminLogin';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
 import { AdminDayView } from '../pages/admin/AdminDayView';
+import { AdminMonthlyReport } from '../pages/admin/AdminMonthlyReport';
 import logoSvg from '../assets/logo.svg';
 import iconPng from '../assets/icon.png';
 
@@ -27,6 +28,7 @@ export function Layout() {
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/day/:date" element={<AdminDayView />} />
+          <Route path="/admin/report" element={<AdminMonthlyReport />} />
         </Routes>
       </Box>
     );

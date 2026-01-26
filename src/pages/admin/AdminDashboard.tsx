@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Paper, Title, Group, Button, Loader, Center, Badge, Text, Stack, SimpleGrid } from '@mantine/core';
-import { IconLogout, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconLogout, IconChevronLeft, IconChevronRight, IconReportMoney } from '@tabler/icons-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 
 interface DayCounts {
@@ -131,9 +131,18 @@ export function AdminDashboard() {
       <Paper shadow="sm" p="xl" radius="md" withBorder>
         <Group justify="space-between" mb="xl">
           <Title order={2}>Order Management</Title>
-          <Button variant="subtle" color="gray" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
-            Logout
-          </Button>
+          <Group>
+            <Button
+              variant="light"
+              leftSection={<IconReportMoney size={16} />}
+              onClick={() => navigate('/admin/report')}
+            >
+              Tax Report
+            </Button>
+            <Button variant="subtle" color="gray" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
+              Logout
+            </Button>
+          </Group>
         </Group>
 
         <Group justify="center" mb="md">
