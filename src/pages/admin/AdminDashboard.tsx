@@ -137,7 +137,7 @@ export function AdminDashboard() {
               leftSection={<IconReportMoney size={16} />}
               onClick={() => navigate('/admin/report')}
             >
-              Tax Report
+             Monthly Tax Report
             </Button>
             <Button variant="subtle" color="gray" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
               Logout
