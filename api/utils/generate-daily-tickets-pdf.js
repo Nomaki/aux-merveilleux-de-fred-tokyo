@@ -44,15 +44,38 @@ export function generateDailyTicketsPDF(orders) {
       const ticketWidth = 595.28 / 4; // 148.82pt (~52mm)
       const ticketHeight = 841.89 / 3; // 280.63pt (~99mm)
 
+      // Helper function to draw cut lines on current page
+      const drawCutLines = () => {
+        doc.save().strokeColor('#cccccc').dash(5, { space: 5 });
+
+        // Vertical cut lines (4 columns)
+        for (let i = 1; i < 4; i++) {
+          doc
+            .moveTo(ticketWidth * i, 0)
+            .lineTo(ticketWidth * i, 841.89)
+            .stroke();
+        }
+
+        // Horizontal cut lines (3 rows)
+        for (let i = 1; i < 3; i++) {
+          doc
+            .moveTo(0, ticketHeight * i)
+            .lineTo(595.28, ticketHeight * i)
+            .stroke();
+        }
+
+        doc.restore();
+      };
+
       // Draw each order as one ticket in the grid
       let ticketIndex = 0;
-      let pageIndex = 0;
 
       orders.forEach((order) => {
-        // If we've filled 12 tickets (4x3 grid), start a new page
+        // If we've filled 12 tickets (4x3 grid), draw cut lines and start a new page
         if (ticketIndex > 0 && ticketIndex % 12 === 0) {
+          // Draw cut lines on current page before adding new page
+          drawCutLines();
           doc.addPage();
-          pageIndex++;
           ticketIndex = 0;
         }
 
@@ -82,33 +105,8 @@ export function generateDailyTicketsPDF(orders) {
         ticketIndex++;
       });
 
-      // Draw cut lines for all pages (dashed)
-      const totalPages = Math.ceil(orders.length / 12);
-      for (let page = 0; page < totalPages; page++) {
-        if (page > 0) {
-          doc.switchToPage(page);
-        }
-
-        doc.save().strokeColor('#cccccc').dash(5, { space: 5 });
-
-        // Vertical cut lines (4 columns)
-        for (let i = 1; i < 4; i++) {
-          doc
-            .moveTo(ticketWidth * i, 0)
-            .lineTo(ticketWidth * i, 841.89)
-            .stroke();
-        }
-
-        // Horizontal cut lines (3 rows)
-        for (let i = 1; i < 3; i++) {
-          doc
-            .moveTo(0, ticketHeight * i)
-            .lineTo(595.28, ticketHeight * i)
-            .stroke();
-        }
-
-        doc.restore();
-      }
+      // Draw cut lines on the last page
+      drawCutLines();
 
       doc.end();
     } catch (error) {
