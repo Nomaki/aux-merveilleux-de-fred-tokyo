@@ -13,6 +13,8 @@
   },
   "form": {
     "title": "Cake Reservation Form",
+    "disclaimerSeating": "The cake reservation doesn't include a seat reservation. It may be possible that you have to wait for a while if the cafe is full.",
+    "disclaimerMessage": "Please make sure to write your desired message in the message section. If nothing is written, your cake will be without message plate. The displayed picture is an example of the message \"Happy birthday\".",
     "nameKanji": "First Name (Kanji)",
     "familyNameKanji": "Family Name (Kanji)",
     "nameKatakana": "First Name (Katakana)",

@@ -13,6 +13,8 @@
   },
   "form": {
     "title": "ケーキご予約フォーム",
+    "disclaimerSeating": "お席のご予約は承っておりません。満席の場合は、恐れ入りますが、少々お待ちいただく場合がございます。",
+    "disclaimerMessage": "メッセージ欄にご希望のメッセージを必ずご記入ください。ご記入がない場合、メッセージプレートは付きません。表示されている写真は「Happy birthday」のメッセージ例です。",
     "nameKanji": "お名前（漢字）",
     "familyNameKanji": "姓（漢字）",
     "nameKatakana": "お名前（カタカナ）",

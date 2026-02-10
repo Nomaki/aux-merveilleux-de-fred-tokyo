@@ -255,8 +255,13 @@ export function ReservationForm() {
           {t('form.title')}
         </Title>
 
-        <Alert icon={<IconInfoCircle size={16} />} mb="lg" color="blue">
-          <Text size="sm">{t('validation.minDate')}</Text>
+       
+
+        <Alert icon={<IconInfoCircle size={16} />} mb="lg" color="orange" variant="light">
+          <Stack gap="xs">
+            <Text size="sm">{t('form.disclaimerSeating')}</Text>
+            <Text size="sm">{t('form.disclaimerMessage')}</Text>
+          </Stack>
         </Alert>
 
         <form
@@ -293,6 +298,9 @@ export function ReservationForm() {
             </Grid>
 
             <Box>
+              <Alert icon={<IconInfoCircle size={16} />} mb="lg" color="blue">
+                <Text size="sm">{t('validation.minDate')}</Text>
+              </Alert>
               <DatePickerInput
                 label={t('form.deliveryDateTime')}
                 placeholder={t('form.deliveryDateTimeHint')}
